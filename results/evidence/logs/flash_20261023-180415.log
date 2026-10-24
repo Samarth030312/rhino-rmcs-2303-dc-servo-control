@@ -1,0 +1,4 @@
+"/home/odyssix/Projects/enr312-lab/scripts/setup/upload" motor /dev/ttyUSB0 2>&1
+Sketch /home/odyssix/Projects/enr312-lab/dc_motor/firmware/motor_controller -> /dev/ttyUSB0  (FW_REV a667d66-dirty)
+Sketch uses 18760 bytes (58%) of program storage space. Maximum is 32256 bytes.
+Global variables use 1281 bytes (62%) of dynamic memory, leaving 767 bytes for local variables. Maximum is 2048 bytes.

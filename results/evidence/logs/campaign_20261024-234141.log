@@ -1,0 +1,22 @@
+23:41:41  campaign on /dev/ttyUSB0, 9 step(s)
+23:41:57  connected: fw e60d046-dirty · drive id 7
+23:42:02  drive check: Drive check done (register dump and loop time in the dialog and the session log).
+23:42:04  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:42:30  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  26 s  runs: MOTOR-R0089_20261024-234215_M1 [FINISHED], MOTOR-R0090_20261024-234228_M1 [FINISHED]  
+23:42:33  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:42:59  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  26 s  runs: MOTOR-R0091_20261024-234244_M1 [FINISHED], MOTOR-R0092_20261024-234256_M1 [FINISHED]  
+23:43:02  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:43:27  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  25 s  runs: MOTOR-R0093_20261024-234312_M1 [FINISHED], MOTOR-R0094_20261024-234325_M1 [FINISHED]  
+23:43:30  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:43:55  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  25 s  runs: MOTOR-R0095_20261024-234340_M1 [FINISHED], MOTOR-R0096_20261024-234353_M1 [FINISHED]  
+23:43:58  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:44:23  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  25 s  runs: MOTOR-R0097_20261024-234408_M1 [FINISHED], MOTOR-R0098_20261024-234420_M1 [FINISHED]  
+23:44:26  M1  RUN  Speed steps, open loop
+23:44:49  M1  DONE Speed steps, open loop  23 s  runs: MOTOR-R0099_20261024-234446_M1 [FINISHED]  
+23:44:52  M1  RUN  Direction and reversal, open loop
+23:45:07  M1  DONE Direction and reversal, open loop  15 s  runs: MOTOR-R0100_20261024-234504_M1 [FINISHED]  
+23:45:11  M5  RUN  Speed tracking, PI  · Kp 0.3 Ki 1.5
+23:45:33  M5  DONE Speed tracking, PI  · Kp 0.3 Ki 1.5  23 s  runs: MOTOR-R0101_20261024-234531_M5 [FINISHED]  
+23:45:36  M6  RUN  S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder
+23:45:51  M6  DONE S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder  14 s  runs: MOTOR-R0102_20261024-234548_M6 [FINISHED]  
+23:45:53  campaign finished

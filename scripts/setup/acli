@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# arduino-cli bound to this project's own cores and libraries (scripts/setup/env.sh).
+#   scripts/setup/acli board list
+# Not installed yet? In MATLAB:  setup fix   (or run install/linux/install.sh)
+set -euo pipefail
+. "$(cd "$(dirname "$0")" && pwd)/env.sh"
+if [ ! -x "$SERVOLAB_CLI" ]; then
+  echo "arduino-cli is not installed in $SERVOLAB_TOOLS. In MATLAB run: setup fix" >&2
+  exit 127
+fi
+exec "$SERVOLAB_CLI" "$@"

@@ -1,0 +1,214 @@
+{
+  "run_id": "MOTOR-07-SIM-20261009-135937",
+  "data_class": "SIMULATION",
+  "statement": "MODEL output. Not measured. Plant parameters are ESTIMATED unless marked otherwise.",
+  "created": "2026-10-09T13:59:37+0530",
+  "matlab_version": "26.1.0.3346908 (R2026a) Update 5",
+  "git": {
+    "revision": "e5dcf90",
+    "dirty": true
+  },
+  "config": {
+    "plant": "rig",
+    "loop": "speed",
+    "ctrl": "PI",
+    "Kd": 0,
+    "Tf": 0.01,
+    "tStep": 0.2,
+    "Tend": 5,
+    "dist": 0,
+    "tDist": 3,
+    "quant": true,
+    "dt": 0.001,
+    "experiment": "MOTOR-07",
+    "uMax": 180,
+    "Ts": 0.1,
+    "latency": 0.07,
+    "setpoint": 100,
+    "Kp": 0.3,
+    "Ki": 2.5
+  },
+  "units": {
+    "y": "rpm (output shaft)",
+    "u": "rpm command (output shaft)"
+  },
+  "parameters": {
+    "N": {
+      "value": 100,
+      "unit": "-",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "V_nom": {
+      "value": 12,
+      "unit": "V",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "w_nl_base": {
+      "value": 1884.9555921538758,
+      "unit": "rad/s",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "I_nl": {
+      "value": 0.8,
+      "unit": "A",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "I_max_motor": {
+      "value": 7.5,
+      "unit": "A",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "T_rated_out": {
+      "value": 1.4709975,
+      "unit": "N*m",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "T_stall_out": {
+      "value": 5.88399,
+      "unit": "N*m",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "lines": {
+      "value": 13,
+      "unit": "-",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "cpr_out": {
+      "value": 5200,
+      "unit": "count",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-003"
+    },
+    "R": {
+      "value": 1.6,
+      "unit": "ohm",
+      "status": "ESTIMATED",
+      "source": "SRC-003"
+    },
+    "Ke": {
+      "value": 0.005687136633150393,
+      "unit": "V*s/rad",
+      "status": "ESTIMATED",
+      "source": "SRC-003"
+    },
+    "Kt": {
+      "value": 0.005687136633150393,
+      "unit": "N*m/A",
+      "status": "ESTIMATED",
+      "source": "SRC-003"
+    },
+    "b": {
+      "value": 2.4136957525463575E-6,
+      "unit": "N*m*s/rad",
+      "status": "ESTIMATED",
+      "source": "SRC-003"
+    },
+    "J": {
+      "value": 1E-6,
+      "unit": "kg*m^2",
+      "status": "ESTIMATED",
+      "source": ""
+    },
+    "L": {
+      "value": 0.0005,
+      "unit": "H",
+      "status": "ESTIMATED",
+      "source": ""
+    },
+    "eta": {
+      "value": 1,
+      "unit": "-",
+      "status": "ASSUMED",
+      "source": "SRC-003"
+    },
+    "J_load_out": {
+      "value": 0,
+      "unit": "kg*m^2",
+      "status": "ASSUMED",
+      "source": ""
+    },
+    "I_lim_drive": {
+      "value": 3,
+      "unit": "A",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-002"
+    },
+    "V_supply": {
+      "value": 12,
+      "unit": "V",
+      "status": "UNVERIFIED",
+      "source": ""
+    },
+    "acc_base_rpm_s": {
+      "value": 20000,
+      "unit": "rpm/s",
+      "status": "UNVERIFIED",
+      "source": "SRC-002"
+    },
+    "spd_max_base_rpm": {
+      "value": 18000,
+      "unit": "rpm",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-002"
+    },
+    "wc_drive": {
+      "value": 40,
+      "unit": "rad/s",
+      "status": "ESTIMATED",
+      "source": ""
+    },
+    "baud_drive": {
+      "value": 9600,
+      "unit": "bit/s",
+      "status": "VERIFIED_FROM_MANUAL",
+      "source": "SRC-002"
+    },
+    "Ts_speed": {
+      "value": 0.1,
+      "unit": "s",
+      "status": "ESTIMATED",
+      "source": ""
+    },
+    "Ts_position": {
+      "value": 0.15,
+      "unit": "s",
+      "status": "ESTIMATED",
+      "source": ""
+    },
+    "lat_speed": {
+      "value": 0.07,
+      "unit": "s",
+      "status": "ESTIMATED",
+      "source": ""
+    },
+    "lat_position": {
+      "value": 0.135,
+      "unit": "s",
+      "status": "ESTIMATED",
+      "source": ""
+    }
+  },
+  "metrics": {
+    "band": 2,
+    "rise": 0.38699999999999996,
+    "over": 2.0381134377898569,
+    "settle": 1.088,
+    "ess": 0.0021861180469784358,
+    "ess_pct": 0.0021861180469784358,
+    "peakU": 101.6055,
+    "satFrac": 0,
+    "iae": 35.438450342537486,
+    "distPeak": null,
+    "distFinal": null,
+    "verdict": "SETTLED"
+  },
+  "preset": "Rig - speed - PI, Kp 0.3 Ki 2.5"
+}

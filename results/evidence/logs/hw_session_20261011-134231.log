@@ -1,0 +1,5 @@
+# session log started 11-Oct-2026 13:42:31, port /dev/ttyACM0
+ 3168.181 < # RMCS-2303 found, slave id 7
+ 3168.182 < $HELLO,1,enr312_motor,e5dcf90-dirty,7*5E
+ 3168.802 > $STOP,1*05
+ 3169.197 < $ACK,1,STOP*60

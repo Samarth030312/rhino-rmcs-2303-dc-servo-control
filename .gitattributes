@@ -1,0 +1,32 @@
+# Same bytes on Windows, macOS and Linux, whatever core.autocrlf says.
+* text=auto eol=lf
+
+# Windows scripts need CRLF
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+*.ps1  text eol=crlf
+
+# Unix scripts must stay LF (a CRLF shebang does not run)
+*.sh   text eol=lf
+scripts/setup/acli     text eol=lf
+scripts/setup/upload   text eol=lf
+scripts/setup/arduino-ide text eol=lf
+install/**/*.sh text eol=lf
+
+# Binary: never converted or diffed as text
+*.slx   binary
+*.mlx   binary
+*.mat   binary
+*.mlapp binary
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.gif   binary
+*.mp4   binary
+*.avi   binary
+*.zip   binary
+*.bin   binary
+
+# Recorded evidence is kept byte-exact (serial logs contain the board's own line endings)
+*.log -text
+data/raw/** -text

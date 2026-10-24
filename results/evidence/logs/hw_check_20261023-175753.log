@@ -1,0 +1,32 @@
+--- boot
+
+--- DIAG
+
+--- RUN +20 rpm, 3 s
+# no RMCS-2303 answered on ids 11,7,1..6 (send $DIAG,1 or $RUN,1 to retry)
+$HELLO,1,enr312_motor,dev,0*49
+# RMCS-2303 found, slave id 7
+# drive LPR was 334, setting 13 (not saved to EEPROM)
+# DIAG slave 7
+# reg 0 id/save = 2047 (0x7FF)
+# reg 2 mode = 512 (0x200)
+# reg 4 P gain = 22 (0x16)
+# reg 6 I gain = 16 (0x10)
+# reg 8 VFF gain = 32 (0x20)
+# reg 10 LPR = 13 (0xD)
+# reg 12 accel = 20000 (0x4E20)
+# reg 14 speed cmd = 9000 (0x2328)
+# reg 24 speed fb = 0 (0x0)
+# position counts = 0
+$ACK,1,DIAG*73
+$ACK,1,HOME*77
+$ACK,1,CFG*3A
+$ERR,1,?,1,checksum*77
+
+--- STOP
+Traceback (most recent call last):
+  File "<stdin>", line 19, in <module>
+  File "<stdin>", line 12, in read
+  File "/home/odyssix/.local/lib/python3.10/site-packages/serial/serialposix.py", line 595, in read
+    raise SerialException(
+serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)

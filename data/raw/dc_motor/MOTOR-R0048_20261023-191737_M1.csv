@@ -1,0 +1,3 @@
+seq,t_ms,loop,ctrl,setpoint,meas,err,u,pos_counts,spd_base_rpm,flags,t_s
+0,100,E,OL,0,-163.307,163.307,0,28541,NaN,1,0.1
+1,200,E,OL,0,-168.231,168.231,0,27083,NaN,16,0.2

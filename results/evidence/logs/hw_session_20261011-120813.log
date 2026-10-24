@@ -1,0 +1,5 @@
+# session log started 11-Oct-2026 12:08:13, port /dev/ttyUSB0
+  826.338 < # RMCS-2303 found, slave id 7
+  826.344 < $HELLO,1,enr312_motor,e5dcf90-dirty,7*5E
+  843.670 < # RMCS-2303 found, slave id 7
+  843.675 < $HELLO,1,enr312_motor,e5dcf90-dirty,7*5E

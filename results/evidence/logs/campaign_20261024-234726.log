@@ -1,0 +1,18 @@
+23:47:26  campaign on /dev/ttyUSB0, 7 step(s)
+23:47:39  connected: fw f87b283-dirty · drive id 7
+23:47:44  drive check: Drive check done (register dump and loop time in the dialog and the session log).
+23:47:47  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:48:13  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  26 s  runs: MOTOR-R0103_20261024-234757_M1 [FINISHED], MOTOR-R0104_20261024-234810_M1 [FINISHED]  
+23:48:16  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:48:41  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  25 s  runs: MOTOR-R0105_20261024-234826_M1 [FINISHED], MOTOR-R0106_20261024-234838_M1 [FINISHED]  
+23:48:44  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:49:09  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  25 s  runs: MOTOR-R0107_20261024-234854_M1 [FINISHED], MOTOR-R0108_20261024-234906_M1 [FINISHED]  
+23:49:12  M1  RUN  Speed steps, open loop
+23:49:35  M1  DONE Speed steps, open loop  23 s  runs: MOTOR-R0109_20261024-234932_M1 [FINISHED]  
+23:49:38  M1  RUN  Direction and reversal, open loop
+23:49:52  M1  DONE Direction and reversal, open loop  15 s  runs: MOTOR-R0110_20261024-234950_M1 [FINISHED]  
+23:49:55  M5  RUN  Speed tracking, PI  · Kp 0.3 Ki 1.5
+23:50:18  M5  DONE Speed tracking, PI  · Kp 0.3 Ki 1.5  23 s  runs: MOTOR-R0111_20261024-235015_M5 [FINISHED]  
+23:50:21  M6  RUN  S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder
+23:50:36  M6  DONE S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder  15 s  runs: MOTOR-R0112_20261024-235033_M6 [FINISHED]  
+23:50:38  campaign finished

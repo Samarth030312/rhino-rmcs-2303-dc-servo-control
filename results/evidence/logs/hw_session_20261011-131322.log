@@ -1,0 +1,11 @@
+# session log started 11-Oct-2026 13:13:22, port /dev/ttyACM0
+ 1419.034 > $ESTOP,1*40
+ 1419.035 < # RMCS-2303 found, slave id 7
+ 1419.361 < $HELLO,1,enr312_motor,e5dcf90-dirty,7*5E
+ 1419.362 < $ACK,1,ESTOP*25
+ 1420.197 > $ESTOP,1*40
+ 1420.377 < $ACK,1,ESTOP*25
+ 1421.071 > $HOME,1*12
+ 1421.393 < $ACK,1,HOME*77
+ 1423.541 > $ESTOP,1*40
+ 1424.431 < $ACK,1,ESTOP*25

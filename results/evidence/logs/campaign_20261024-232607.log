@@ -1,0 +1,39 @@
+23:26:07  campaign on /dev/ttyUSB0, missions M1 M2 M3 M4 M5 M6 M7 M8 M9
+23:26:20  connected: fw 937bb34 · drive id 7
+23:26:24  drive check: Drive check done (register dump and loop time in the dialog and the session log).
+23:26:27  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+23:26:43  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  16 s  runs: MOTOR-R0062_20261024-232637_M1 [FINISHED], MOTOR-R0063_20261024-232640_M1 [STOPPED: runaway: too fast - check encoder and LPR]  FAULT runaway: too fast - check encoder and LPR
+23:26:44  cleared fault, state READY
+23:26:47  M1  RUN  Speed steps, open loop
+23:27:10  M1  DONE Speed steps, open loop  23 s  runs: MOTOR-R0064_20261024-232707_M1 [FINISHED]  
+23:27:13  M1  RUN  Direction and reversal, open loop
+23:27:15  M1  DONE Direction and reversal, open loop  3 s  runs: MOTOR-R0065_20261024-232713_M1 [STOPPED: runaway: wrong way - swap encoder pins 10/11]  FAULT runaway: wrong way - swap encoder pins 10/11
+23:27:17  cleared fault, state READY
+23:27:20  M2  RUN  ▶▶ all 2 runs: S3-3: static map, speed vs command
+23:28:48  M2  DONE ▶▶ all 2 runs: S3-3: static map, speed vs command  88 s  runs: MOTOR-R0066_20261024-232801_M2 [FINISHED], MOTOR-R0067_20261024-232845_M2 [FINISHED]  
+23:28:52  M3  RUN  ▶▶ all 3 runs: Speed P gain sweep
+23:29:23  M3  DONE ▶▶ all 3 runs: Speed P gain sweep  32 s  runs: MOTOR-R0068_20261024-232900_M3 [FINISHED], MOTOR-R0069_20261024-232910_M3 [FINISHED], MOTOR-R0070_20261024-232921_M3 [FINISHED]  
+23:29:26  M4  RUN  ▶▶ all 4 runs: S3-9: speed I only, Ki sweep 0.5 / 1 / 2 / 4
+23:30:16  M4  DONE ▶▶ all 4 runs: S3-9: speed I only, Ki sweep 0.5 / 1 / 2 / 4  50 s  runs: MOTOR-R0071_20261024-232936_M4 [FINISHED], MOTOR-R0072_20261024-232949_M4 [FINISHED], MOTOR-R0073_20261024-233001_M4 [FINISHED], MOTOR-R0074_20261024-233014_M4 [FINISHED]  
+23:30:19  M4  RUN  Speed I only  · Ki 1
+23:30:37  M4  DONE Speed I only  · Ki 1  19 s  runs: MOTOR-R0075_20261024-233035_M4 [FINISHED]  
+23:30:40  M5  RUN  S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder
+23:31:05  M5  DONE S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder  25 s  runs: MOTOR-R0076_20261024-233102_M5 [FINISHED]  
+23:31:08  M5  RUN  Speed PI step, 60 rpm  · Kp 0.3 Ki 1.5
+23:31:20  M5  DONE Speed PI step, 60 rpm  · Kp 0.3 Ki 1.5  13 s  runs: MOTOR-R0077_20261024-233118_M5 [FINISHED]  
+23:31:23  M5  RUN  Speed tracking, PI  · Kp 0.3 Ki 1.5
+23:31:45  M5  DONE Speed tracking, PI  · Kp 0.3 Ki 1.5  23 s  runs: MOTOR-R0078_20261024-233143_M5 [FINISHED]  
+23:31:48  M6  RUN  S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder
+23:31:51  M6  DONE S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder  3 s  runs: MOTOR-R0079_20261024-233149_M6 [STOPPED: runaway: wrong way - swap encoder pins 10/11]  FAULT runaway: wrong way - swap encoder pins 10/11
+23:31:52  cleared fault, state READY
+23:31:56  M7  RUN  ▶▶ all 3 runs: S3-5: position P final error, 10 deg moves
+23:32:24  M7  DONE ▶▶ all 3 runs: S3-5: position P final error, 10 deg moves  29 s  runs: MOTOR-R0080_20261024-233204_M7 [FINISHED], MOTOR-R0081_20261024-233212_M7 [FINISHED], MOTOR-R0082_20261024-233221_M7 [FINISHED]  
+23:32:27  M7  RUN  ▶▶ all 3 runs: Position P gain sweep
+23:32:55  M7  DONE ▶▶ all 3 runs: Position P gain sweep  28 s  runs: MOTOR-R0083_20261024-233234_M7 [FINISHED], MOTOR-R0084_20261024-233243_M7 [FINISHED], MOTOR-R0085_20261024-233253_M7 [FINISHED]  
+23:32:58  M7  RUN  Position moves, P (Kp 0.3): 90, -90, 360 deg  · Kp 0.3
+23:33:26  M7  DONE Position moves, P (Kp 0.3): 90, -90, 360 deg  · Kp 0.3  29 s  runs: MOTOR-R0086_20261024-233324_M7 [FINISHED]  
+23:33:30  M8  RUN  Position I only (Ki 0.1): expect oscillation  · Ki 0.1
+23:33:44  M8  DONE Position I only (Ki 0.1): expect oscillation  · Ki 0.1  15 s  runs: MOTOR-R0087_20261024-233342_M8 [FINISHED]  
+23:33:47  M9  RUN  Position PI  · Kp 0.3 Ki 0.03
+23:34:02  M9  DONE Position PI  · Kp 0.3 Ki 0.03  14 s  runs: MOTOR-R0088_20261024-233359_M9 [FINISHED]  
+23:34:04  campaign finished

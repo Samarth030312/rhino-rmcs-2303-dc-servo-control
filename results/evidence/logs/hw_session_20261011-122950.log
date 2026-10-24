@@ -1,0 +1,33 @@
+# session log started 11-Oct-2026 12:29:50, port /dev/ttyACM0
+  299.109 < # RMCS-2303 found, slave id 7
+  299.173 < $HELLO,1,enr312_motor,e5dcf90-dirty,7*5E
+  303.876 > $DIAG,1*16
+  303.933 < # DIAG slave 7
+  303.939 < # reg 0 id/save = 2047 (0x7FF)
+  303.953 < # reg 2 mode = 512 (0x200)
+  304.010 < # reg 4 P gain = 32 (0x20)
+  304.017 < # reg 6 I gain = 30 (0x1E)
+  304.050 < # reg 8 VFF gain = 25 (0x19)
+  304.083 < # reg 10 LPR = 13 (0xD)
+  304.137 < # reg 12 accel = 5000 (0x1388)
+  304.150 < # reg 14 speed cmd = 2016 (0x7E0)
+  304.182 < # reg 24 speed fb = 0 (0x0)
+  304.224 < # position counts = 1539242
+  304.225 < $ACK,1,DIAG*73
+  310.090 > $CFG,1,S,OL,0,0,0,10,100,180*36
+  310.096 > $SET,1,20*71
+  310.101 > $RUN,1*54
+  310.135 < $ACK,1,CFG*3A
+  310.136 < $ACK,1,SET*3A
+  310.239 < $ACK,1,RUN*31
+  310.351 < $TEL,1,0,100,S,OL,20.00,-161.400,181.400,20.000,nan,-16140,1*61
+  310.729 < $ERR,1,RUN,11,runaway: wrong way, swap encoder pins 10/11*0B
+  310.733 < $TEL,1,1,200,S,OL,20.00,-166.050,186.050,0.000,nan,-16605,10*67
+  313.139 > $CFG,1,S,OL,0,0,0,10,100,180*36
+  313.143 > $SET,1,20*71
+  313.146 > $RUN,1*54
+  313.175 < $ACK,1,CFG*3A
+  313.180 < $ACK,1,SET*3A
+  313.182 < $ERR,1,RUN,6,estopped: power-cycle or HOME*2D
+  316.516 > $ESTOP,1*40
+  317.011 < $ACK,1,ESTOP*25

@@ -1,0 +1,52 @@
+# session log started 11-Oct-2026 12:18:34, port /dev/ttyACM0
+ 1448.457 > $DIAG,1*16
+ 1448.467 < =================================
+ 1448.473 < OPEN LOOP FISH TAIL CONTROL
+ 1448.474 < =================================
+ 1448.475 < Tail Amplitude : 0 - 25 deg
+ 1448.476 < Motor Multiplier: 9.8
+ 1448.479 < RPM Range      : 0 - 1 RPM
+ 1448.479 < System Ready
+ 1448.480 < Tail Amp: 11.63 deg | Motor Amp: 95.39 deg | Target RPM: 63.490 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 53 | Freq: 0.998 Hz | Motor: ON
+ 1448.480 < Tail Amp: 7.55 deg | Motor Amp: 61.92 deg | Target RPM: 45.015 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 38 | Freq: 1.090 Hz | Motor: ON
+ 1448.481 < Tail Amp: 4.67 deg | Motor Amp: 38.27 deg | Target RPM: 27.713 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 23 | Freq: 1.086 Hz | Motor: ON
+ 1448.481 < Tail Amp: 2.71 deg | Motor Amp: 22.24 deg | Target RPM: 15.982 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 1.078 Hz | Motor: ON
+ 1448.482 < Tail Amp: 1.66 deg | Motor Amp: 13.63 deg | Target RPM: 9.824 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1448.482 < Tail Amp: 1.25 deg | Motor Amp: 10.22 deg | Target RPM: 7.331 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1448.484 < Tail Amp: 1.05 deg | Motor Amp: 8.62 deg | Target RPM: 6.158 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1448.588 < Tail Amp: 1.00 deg | Motor Amp: 8.22 deg | Target RPM: 5.865 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1448.791 < Tail Amp: 0.88 deg | Motor Amp: 7.21 deg | Target RPM: 5.132 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1448.993 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1449.195 < Tail Amp: 0.95 deg | Motor Amp: 7.82 deg | Target RPM: 5.572 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1449.397 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1449.599 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1449.801 < Tail Amp: 0.86 deg | Motor Amp: 7.01 deg | Target RPM: 4.985 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1450.003 < Tail Amp: 0.90 deg | Motor Amp: 7.41 deg | Target RPM: 5.279 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1450.204 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1450.406 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1450.608 < Tail Amp: 0.95 deg | Motor Amp: 7.82 deg | Target RPM: 5.572 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1450.810 < Tail Amp: 0.86 deg | Motor Amp: 7.01 deg | Target RPM: 5.132 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1451.012 < Tail Amp: 0.90 deg | Motor Amp: 7.41 deg | Target RPM: 5.279 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1451.264 < Tail Amp: 0.86 deg | Motor Amp: 7.01 deg | Target RPM: 4.545 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1451.429 < Tail Amp: 0.88 deg | Motor Amp: 7.21 deg | Target RPM: 5.132 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1452.508 > $DIAG,1*16
+ 1452.510 < Tail Amp: 0.90 deg | Motor Amp: 7.41 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1452.510 < Tail Amp: 0.88 deg | Motor Amp: 7.21 deg | Target RPM: 5.132 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1452.511 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.279 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1452.511 < Tail Amp: 0.86 deg | Motor Amp: 7.01 deg | Target RPM: 4.839 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1452.512 < Tail Amp: 0.90 deg | Motor Amp: 7.41 deg | Target RPM: 5.279 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1452.664 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1452.866 < Tail Amp: 0.88 deg | Motor Amp: 7.21 deg | Target RPM: 5.132 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1453.069 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1453.271 < Tail Amp: 0.81 deg | Motor Amp: 6.61 deg | Target RPM: 4.692 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1453.473 < Tail Amp: 0.88 deg | Motor Amp: 7.21 deg | Target RPM: 5.279 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1453.675 < Tail Amp: 0.95 deg | Motor Amp: 7.82 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1453.877 < Tail Amp: 0.86 deg | Motor Amp: 7.01 deg | Target RPM: 4.985 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1454.079 < Tail Amp: 0.90 deg | Motor Amp: 7.41 deg | Target RPM: 5.279 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1454.282 < Tail Amp: 0.78 deg | Motor Amp: 6.41 deg | Target RPM: 4.545 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1454.484 < Tail Amp: 0.88 deg | Motor Amp: 7.21 deg | Target RPM: 5.132 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1454.686 < Tail Amp: 0.90 deg | Motor Amp: 7.41 deg | Target RPM: 5.279 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1454.888 < Tail Amp: 0.86 deg | Motor Amp: 7.01 deg | Target RPM: 4.839 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1455.090 < Tail Amp: 0.93 deg | Motor Amp: 7.61 deg | Target RPM: 5.425 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1455.293 < Tail Amp: 0.83 deg | Motor Amp: 6.81 deg | Target RPM: 4.839 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF
+ 1455.458 < Tail Amp: 0.88 deg | Motor Amp: 7.21 deg | Target RPM: 5.279 | Actual RPM: 0.000 | Angle: 0.00 deg | PWM: 13 | Freq: 0.000 Hz | Motor: OFF

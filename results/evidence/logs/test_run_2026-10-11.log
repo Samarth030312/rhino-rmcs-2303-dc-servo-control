@@ -1,0 +1,120 @@
+Running test_export
+..
+Done test_export
+__________
+
+Running test_firmware_transcript
+..
+Done test_firmware_transcript
+__________
+
+Running test_hardware_link
+.......
+Done test_hardware_link
+__________
+
+Running test_level_model
+.......
+Done test_level_model
+__________
+
+Running test_motor_model
+.......... .....
+Done test_motor_model
+__________
+
+Running test_protocol
+..........
+Done test_protocol
+__________
+
+Running test_simulink_crosscheck
+[Warning: The model name 'enr312_dc_motor' is shadowing another name in the
+MATLAB workspace or path. Type "which -all enr312_dc_motor" at the command line
+to find the other uses of this name. You should change the name of the model to
+avoid problems.] 
+[> In build_dc_motor_simulink (line 27)
+In test_simulink_crosscheck>setupOnce (line 11)]
+[Warning: The file containing block diagram 'enr312_dc_motor' is shadowed by a
+file of the same name higher on the MATLAB path. This can cause unexpected
+behavior. For more information see <a href="matlab:helpview([docroot
+'/toolbox/simulink/helptargets.map'], 'shadowing')">"Avoiding Problems with
+Shadowed Files"</a> in the Simulink documentation.
+
+The file containing the block diagram is:
+/tmp/tpe684ae22_b320_4216_8554_8324df573849/enr312_dc_motor.slx.
+The file higher on the MATLAB path is:
+/home/odyssix/Projects/enr312-lab/matlab/models/dc_motor/enr312_dc_motor.slx] 
+[> In pLoadSystem (line 40)
+In load_system (line 17)
+In run_dc_motor_simulink (line 14)
+In test_simulink_crosscheck>testCasesAgree (line 21)]
+  Bare motor - speed - open loop + load    max relative difference 7.04e-12
+[Warning: The file containing block diagram 'enr312_dc_motor' is shadowed by a
+file of the same name higher on the MATLAB path. This can cause unexpected
+behavior. For more information see <a href="matlab:helpview([docroot
+'/toolbox/simulink/helptargets.map'], 'shadowing')">"Avoiding Problems with
+Shadowed Files"</a> in the Simulink documentation.
+
+The file containing the block diagram is:
+/tmp/tpe684ae22_b320_4216_8554_8324df573849/enr312_dc_motor.slx.
+The file higher on the MATLAB path is:
+/home/odyssix/Projects/enr312-lab/matlab/models/dc_motor/enr312_dc_motor.slx] 
+[> In load_system (line 17)
+In run_dc_motor_simulink (line 14)
+In test_simulink_crosscheck>testCasesAgree (line 21)]
+  Bare motor - speed - PI + load           max relative difference 6.15e-11
+[Warning: The file containing block diagram 'enr312_dc_motor' is shadowed by a
+file of the same name higher on the MATLAB path. This can cause unexpected
+behavior. For more information see <a href="matlab:helpview([docroot
+'/toolbox/simulink/helptargets.map'], 'shadowing')">"Avoiding Problems with
+Shadowed Files"</a> in the Simulink documentation.
+
+The file containing the block diagram is:
+/tmp/tpe684ae22_b320_4216_8554_8324df573849/enr312_dc_motor.slx.
+The file higher on the MATLAB path is:
+/home/odyssix/Projects/enr312-lab/matlab/models/dc_motor/enr312_dc_motor.slx] 
+[> In load_system (line 17)
+In run_dc_motor_simulink (line 14)
+In test_simulink_crosscheck>testCasesAgree (line 21)]
+  Bare motor - position - P + load         max relative difference 2.50e-13
+[Warning: The file containing block diagram 'enr312_dc_motor' is shadowed by a
+file of the same name higher on the MATLAB path. This can cause unexpected
+behavior. For more information see <a href="matlab:helpview([docroot
+'/toolbox/simulink/helptargets.map'], 'shadowing')">"Avoiding Problems with
+Shadowed Files"</a> in the Simulink documentation.
+
+The file containing the block diagram is:
+/tmp/tpe684ae22_b320_4216_8554_8324df573849/enr312_dc_motor.slx.
+The file higher on the MATLAB path is:
+/home/odyssix/Projects/enr312-lab/matlab/models/dc_motor/enr312_dc_motor.slx] 
+[> In load_system (line 17)
+In run_dc_motor_simulink (line 14)
+In test_simulink_crosscheck>testCasesAgree (line 21)]
+  Bare motor - position - PID + load       max relative difference 2.84e-13
+.
+Done test_simulink_crosscheck
+__________
+
+Running test_simulink_temperature_level
+  temperature ONOFF   mean diff 0.000 C, duty diff 0.000, early max diff 0.004 C
+  temperature HYST    mean diff 0.139 C, duty diff 0.010, early max diff 0.004 C
+  temperature MA      mean diff 0.018 C, duty diff 0.005, early max diff 0.004 C
+  temperature P       mean diff 0.001 C, duty diff 0.000, early max diff 0.013 C
+.  level ONOFF  period MATLAB 263.7 s, Simulink 267.9 s
+  level P      e_ss MATLAB 9.20 %, Simulink 9.20 %
+  level PI     e_ss MATLAB 0.17 %, Simulink 0.17 %
+.
+Done test_simulink_temperature_level
+__________
+
+Running test_temperature_model
+.......
+Done test_temperature_model
+__________
+
+    Name    Passed    Failed    Incomplete    Duration    Details
+    ____    ______    ______    __________    ________    _______
+
+
+PASSED 53 / 53

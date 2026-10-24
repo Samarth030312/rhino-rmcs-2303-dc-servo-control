@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  host:
+    name: Repository checks and firmware tests on the PC
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repository hygiene (sources, no copyrighted files or videos)
+        run: python3 scripts/validation/check_repo.py
+      - name: Firmware against its emulated plant (g++)
+        run: bash scripts/validation/host_tests.sh
+      - name: The transcript the MATLAB tests parse is reproduced exactly
+        run: git diff --exit-code -- 'firmware/tests/fixtures/*'
+      - name: Installer scripts parse
+        run: bash -n install/linux/install.sh && bash -n install/macos/install.sh
+
+  platforms:
+    name: ${{ matrix.os }} · install, compile, MATLAB tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    env:
+      SERVOLAB_NO_LAUNCH: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer (Windows, run the way the snippet runs it, in memory)
+        if: runner.os == 'Windows'
+        shell: powershell
+        env:
+          SERVOLAB_DIR: ${{ runner.temp }}\clone
+        run: Get-Content install\windows\install.ps1 -Raw | Invoke-Expression
+      - name: Installer (macOS)
+        if: runner.os == 'macOS'
+        env:
+          SERVOLAB_DIR: ${{ runner.temp }}/clone
+        run: bash install/macos/install.sh
+      - name: Installer (Linux)
+        if: runner.os == 'Linux'
+        env:
+          SERVOLAB_DIR: ${{ runner.temp }}/clone
+        run: bash install/linux/install.sh
+
+      - name: Virtual display for the app tests (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y -qq xvfb
+          Xvfb :99 -screen 0 1920x1080x24 &
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+
+      - uses: matlab-actions/setup-matlab@v2
+        with:
+          release: latest
+          products: Simulink
+          cache: true
+
+      - name: setup fix (checks, Arduino toolchain) and firmware compile
+        uses: matlab-actions/run-command@v2
+        with:
+          command: |
+            setup fix;
+            R = servolab.tools.flash('motor', '', 'LogDir', tempdir);
+            disp(R.log); assert(R.ok, 'firmware compile failed');
+
+      - name: MATLAB test suite
+        uses: matlab-actions/run-command@v2
+        with:
+          command: cd('matlab'); run('setup_path.m'); cd('tests'); results = runtests; disp(table(results)); assertSuccess(results);
+
+      - name: Firmware emulator for the end-to-end test (Linux)
+        if: runner.os == 'Linux'
+        run: bash scripts/validation/host_tests.sh
+      - name: End to end, the app <-> the real firmware <-> the emulated plant (Linux)
+        if: runner.os == 'Linux'
+        uses: matlab-actions/run-command@v2
+        with:
+          command: |
+            cd('matlab'); run('setup_path.m'); addpath('tests/e2e');
+            assert(e2e_motor_mission_control(fullfile(pwd, '..', 'firmware', 'tests', 'fwsim')));
+
+  oldest-matlab:
+    name: Oldest supported MATLAB (R2023b) · tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Virtual display for the app tests
+        run: |
+          sudo apt-get install -y -qq xvfb
+          Xvfb :99 -screen 0 1920x1080x24 &
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+      - uses: matlab-actions/setup-matlab@v2
+        with:
+          release: R2023b
+          products: Simulink
+          cache: true
+      - name: MATLAB test suite
+        uses: matlab-actions/run-command@v2
+        with:
+          command: cd('matlab'); run('setup_path.m'); cd('tests'); results = runtests; disp(table(results)); assertSuccess(results);
