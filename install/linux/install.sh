@@ -63,8 +63,8 @@ fi
 cat <<EOF
 
 Next time: open MATLAB and run   cd('$mdir_q'); setup open
-Problems:  in MATLAB run         setup fix
-Push recorded data (after the owner adds your GitHub account as a collaborator):
+Problems:  in MATLAB run         setup probe
+Push recorded data (to a repository you can write to, e.g. your fork):
       git -C "$DIR" add data results && git -C "$DIR" commit -m "data: <what you ran>" && git -C "$DIR" push
 
 EOF

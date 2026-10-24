@@ -82,6 +82,10 @@ function testProfileFieldAcceptsAndRejects(tc)
 end
 
 function testPlaybackMovesTheClock(tc)
+    % R2023b's software renderer on CI's virtual display hangs in drawnow during animated 3-D
+    % playback ("Graphics timeout"); playback is covered by the newer releases on every OS
+    tc.assumeFalse(isMATLABReleaseOlderThan('R2024a') && ~isempty(getenv('CI')), ...
+        'animated playback is not tested on R2023b under a virtual display');
     app = tc.TestData.app; app.selectMission(1); app.setPreset(1);
     app.play('sim'); pause(1.2); drawnow;
     t = sscanf(erase(app.ui.clock.Text, 't ='), '%f');

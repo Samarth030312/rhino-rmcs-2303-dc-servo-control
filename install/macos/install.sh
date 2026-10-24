@@ -57,7 +57,7 @@ else
   (cd "$tmp" && unzip -q main.zip)
   mv "$tmp/rhino-rmcs-2303-dc-servo-control-main" "$DIR"; rm -rf "$tmp"
 fi
-[ -f "$DIR/matlab/setup open.m" ] || { echo "The repository in $DIR is incomplete." >&2; exit 1; }
+[ -f "$DIR/setup.m" ] || { echo "The repository in $DIR is incomplete." >&2; exit 1; }
 
 # ---------------------------------------------------------------- 3. Rosetta 2
 if [ "$(sysctl -n hw.optional.arm64 2>/dev/null || echo 0)" = 1 ]; then
@@ -79,7 +79,7 @@ fi
 
 # ---------------------------------------------------------------- 4. MATLAB
 app="$(ls -d /Applications/MATLAB_R20*.app "$HOME"/Applications/MATLAB_R20*.app 2>/dev/null | sort -r | head -1 || true)"
-mdir="$DIR/matlab"
+mdir="$DIR"
 mdir_q="$(printf '%s' "$mdir" | sed "s/'/''/g")"
 echo
 if [ "${SERVOLAB_NO_LAUNCH:-0}" = 1 ]; then
@@ -94,8 +94,8 @@ fi
 cat <<EOF
 
 Next time: open MATLAB and run   cd('$mdir_q'); setup open
-Problems:  in MATLAB run         setup fix
-Push recorded data (after the owner adds your GitHub account as a collaborator):
+Problems:  in MATLAB run         setup probe
+Push recorded data (to a repository you can write to, e.g. your fork):
       git -C "$DIR" add data results && git -C "$DIR" commit -m "data: <what you ran>" && git -C "$DIR" push
 
 EOF

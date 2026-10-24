@@ -121,7 +121,7 @@ if ($env:SERVOLAB_NO_LAUNCH -eq '1') {
 }
 Write-Host ''
 Write-Host 'Next time: open MATLAB and run   cd(''' + $mdir + '''); setup open'
-Write-Host 'Problems:  in MATLAB run         setup fix'
-Write-Host 'Push recorded data: ask the owner to add your GitHub account as a collaborator, then'
+Write-Host 'Problems:  in MATLAB run         setup probe'
+Write-Host 'Push recorded data: push to a repository you can write to (e.g. your fork):'
 Write-Host "      git -C `"$Dir`" add data results && git -C `"$Dir`" commit -m `"data: <what you ran>`" && git -C `"$Dir`" push"
 Write-Host ''
