@@ -185,7 +185,9 @@ classdef SerialLink < handle
 
         function T = table(obj)
             %TABLE  Telemetry received so far, as a MATLAB table.
-            T = struct2table(structfun(@(v) v(1:obj.n), obj.tel, 'UniformOutput', false));
+            % one snapshot of n: a timer tick may append a frame while the table is built
+            n = obj.n;
+            T = struct2table(structfun(@(v) v(1:n), obj.tel, 'UniformOutput', false));
             T.t_s = T.t_ms / 1000;
         end
 
@@ -231,9 +233,10 @@ classdef SerialLink < handle
                     obj.tel.(fn{i}) = [v; pad];
                 end
             end
-            obj.n = obj.n + 1; i = obj.n;
+            i = obj.n + 1;                               % write the row first, then count it
             fn = fieldnames(t);
             for k = 1:numel(fn), obj.tel.(fn{k})(i) = t.(fn{k}); end
+            obj.n = i;
             if ~isnan(obj.lastSeq) && t.seq ~= obj.lastSeq + 1
                 obj.seqGaps = obj.seqGaps + 1;
             end
