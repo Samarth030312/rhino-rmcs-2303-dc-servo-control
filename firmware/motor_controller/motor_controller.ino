@@ -5,7 +5,7 @@
 // digital speed mode (ED-M1) and streams telemetry to MATLAB with protocol v1
 // (docs/architecture/SERIAL_PROTOCOL.md).
 //
-// PINS (docs/wiring/DC_MOTOR_WIRING.md)
+// PINS (docs/hardware/WIRING.md)
 //   D8  AltSoftSerial RX  <- drive TXD (drive pin 3)
 //   D9  AltSoftSerial TX  -> drive RXD (drive pin 2)
 //   D4  STOP pushbutton to GND (normally open) -> drive E-STOP

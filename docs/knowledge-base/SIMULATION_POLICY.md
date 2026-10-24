@@ -1,52 +1,30 @@
-# Simulation Policy
+# Simulation policy
 
 ## 1. A simulation is a prediction, not a measurement
 
-- Every simulated figure title says **SIMULATION** and "not measured".
-- Every exported run has `data_class: SIMULATION` in `run_config.json`.
-- Simulation output lives under `results/`. It never goes into `data/raw/`.
-- A simulation that "matches the course's expected behaviour" is not validation of the
-  hardware. Only MOTOR-08 (overlay of measured and simulated runs) is.
+- Simulated runs are labelled SIMULATION (`data_class` in their metadata) and live under
+  `results/`, never in `data/raw/`.
+- Agreement with the textbook is not validation. Only a rig run, overlaid on the simulation of
+  its own settings (RUNS → OVERLAY RUN), validates the model.
 
 ## 2. Parameters carry their status
 
-- All plant parameters come from one place: `matlab/functions/+servolab/+motor/params.m`.
-- Each has `status` ∈ {VERIFIED_FROM_MANUAL, MEASURED, TESTED, ESTIMATED, ASSUMED, UNVERIFIED}
-  and a source ID. A test fails if any parameter claims MEASURED before a measurement exists.
-- When the app user moves a physics slider, the exported status becomes
-  `USER_OVERRIDE (ESTIMATED)`.
-- When MOTOR-02 measures a value: change the number **and** the status, and write the run ID
-  in the `source` field.
+All plant parameters come from `servolab.motor.params` and carry a status (VERIFIED_FROM_MANUAL,
+MEASURED, TESTED, ESTIMATED, ASSUMED, UNVERIFIED; see [INDEX](INDEX.md)) and a source. A
+MEASURED value names the session it came from. When a measurement replaces an estimate, change
+the number **and** the status.
 
 ## 3. Simulate the controller that will run
 
-The simulation reproduces the firmware loop, not an idealised continuous one: sample time,
-command latency, encoder/rpm quantisation, output clipping and the exact anti-windup law
-(`pidStep.m`). If the firmware changes any of these, the simulation must change with it.
+The simulation reproduces the firmware's loop, not an idealised continuous one: its sample
+time, its quantised measurement, its output limits and servolab.motor.pidStep and the firmware's pidStep. If the firmware changes any of
+these, the simulation changes with it, in the same commit.
 
-## 4. Reproducibility
+## 4. Two implementations must agree
 
-Each exported run records: run ID, MATLAB version, git revision and dirty flag, the full
-configuration, every parameter with its status, the metrics, and (if recorded) the video
-file name, size and capture method. The configuration alone must reproduce the run:
+`servolab.motor.identifiedSim` and `servo_identified.slx` (and the armature model and `servo_armature.slx`) are two implementations of the same model; test_motor_identified, test_simulink_crosscheck checks they agree. If they disagree,
+one of them is wrong: fix it, do not loosen the tolerance.
 
-```matlab
-meta = jsondecode(fileread('run_config.json'));   % then rebuild c from meta.config
-```
+## 5. What the simulation does not represent
 
-## 5. Two implementations must agree
-
-The bare-motor model exists in MATLAB (`simulate.m`) and Simulink (`servo_armature.slx`).
-`test_simulink_crosscheck` requires agreement to 10⁻⁶ relative; measured agreement on
-2026-10-09 was < 10⁻¹⁰. If they disagree, one of them is wrong; do not loosen the tolerance.
-
-## 6. What the simulations do not represent
-
-Listed in the app's "Model limits" panel and in each experiment's LIMITATIONS: undocumented
-drive internals, Modbus timing not measured, no stiction/dead band/backlash, ideal current loop,
-direction sign unverified. Reports must repeat these next to any simulated result.
-
-## 7. Recordings
-
-See `docs/architecture/VIDEO_AND_EVIDENCE.md`. A run is "recorded" only if the video file
-exists and opens; the recorder writes its size into `run_config.json`.
+the drive's internals beyond its measured ramp, gain and latency; the motor's temperature; the battery's voltage on the day. A report repeats these next to any simulated result it uses.

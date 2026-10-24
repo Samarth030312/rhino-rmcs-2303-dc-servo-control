@@ -207,7 +207,7 @@ All vendor examples use **9600 baud**. Data bits, parity and stop bits are not s
 (OI-M3). D2 and D3 are the Uno's only external-interrupt pins (INT0/INT1).
 
 > **This project does NOT use D2/D3.** It uses AltSoftSerial on **D9 → drive RXD (pin 2)** and
-> **D8 ← drive TXD (pin 3)** (ED-M5). Wire from `docs/wiring/DC_MOTOR_WIRING.md`, not from this summary.
+> **D8 ← drive TXD (pin 3)** (ED-M5). Wire from `docs/hardware/WIRING.md`, not from this summary.
 
 ### 2.9 Vendor Arduino library (pp.30–34)
 

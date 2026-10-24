@@ -1,5 +1,8 @@
 # DC-motor experiments MOTOR-01 … MOTOR-08
 
+> **Pre-registered plans**, kept as written; results in [the session reports](../../results/reports/dc_motor/).
+> In the app these experiments are the missions M1–M9 and their presets.
+
 **Hardware experiment library** (run from `rhino_servo_lab` → mission → RUN ON RIG; definitions in
 `matlab/functions/+servolab/+motor/hwExperiments.m`): MOTOR-02 speed steps open loop (20…120 rpm) ·
 MOTOR-02 direction and reversal · MOTOR-03 speed tracking PI · MOTOR-05 speed P sweep (Kp 0.2/0.5/0.8) ·

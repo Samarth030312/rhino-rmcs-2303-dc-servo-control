@@ -10,5 +10,5 @@ function setup_path()
             addpath(fullfile(a.folder, a.name));
         end
     end
-    addpath(fullfile(here, 'scripts'));
+    if isfolder(fullfile(here, 'scripts')), addpath(fullfile(here, 'scripts')); end
 end
