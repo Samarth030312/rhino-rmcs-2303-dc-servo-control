@@ -20,6 +20,25 @@ function simulink_tidy(sys, groups)
     subs = subs(strcmp(get_param(subs, 'LinkStatus'), 'none') & strcmp(get_param(subs, 'Mask'), 'off'));   % ours, not library blocks
     for k = numel(subs):-1:1, Simulink.BlockDiagram.arrangeSystem(subs{k}); end
     Simulink.BlockDiagram.arrangeSystem(sys);
+    labelMuxInputs(sys);
+    set_param(sys, 'ZoomFactor', 'FitSystem');          % the whole model in view when it opens
+end
+
+function labelMuxInputs(sys)
+    % a scope's legend shows the names of the signals into its Mux: name them after what feeds
+    % them (the output port of a subsystem, or the source block)
+    for m = find_system(sys, 'SearchDepth', 1, 'BlockType', 'Mux')'
+        L = get_param(m{1}, 'LineHandles'); pc = get_param(m{1}, 'PortConnectivity');
+        for k = 1:numel(L.Inport)
+            if L.Inport(k) <= 0 || ~isempty(get_param(L.Inport(k), 'Name')), continue; end
+            src = pc(k).SrcBlock; name = get_param(src, 'Name');
+            if strcmp(get_param(src, 'BlockType'), 'SubSystem')
+                o = find_system(getfullname(src), 'SearchDepth', 1, 'BlockType', 'Outport', 'Port', num2str(pc(k).SrcPort + 1));
+                if ~isempty(o), name = get_param(o{1}, 'Name'); end
+            end
+            set_param(L.Inport(k), 'Name', name);
+        end
+    end
 end
 
 function nameOutports(sub)

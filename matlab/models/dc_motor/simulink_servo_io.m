@@ -56,6 +56,9 @@ function groups = simulink_servo_io(mdl, plantIn, speedOut, angleOut)
     T('measSel/1', 'Measured/1'); T('Read speed/1', 'Measured/2');
     T('counts per Ts to rpm/1', 'Measured/3'); T('counts to deg/1', 'Measured/4');
     T('Measured/1', 'Error/2'); T('Measured/1', 'measured/1');
+    simulink_scope(mdl, 'Scope', {{'Setpoint profile/1', 'Measured/1'}, {'CL or OL/1'}}, ...
+        {'setpoint and measured (rpm or deg)', 'command (output rpm)'}, [1600 20]);
+    simulink_name_signal([mdl '/Setpoint profile'], 1, 'setpoint');
     simulink_name_signal([mdl '/CL or OL'], 1, 'command (output rpm)');
     simulink_name_signal([mdl '/Modbus latency'], 1, 'command at the drive (output rpm)');
     simulink_name_signal([mdl '/Measured'], 1, 'measured');

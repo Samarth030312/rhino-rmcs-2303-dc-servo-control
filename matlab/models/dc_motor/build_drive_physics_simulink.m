@@ -111,6 +111,7 @@ function mdl = build_drive_physics_simulink(outDir)
     T('w/1', 'base rad per s to output rpm/1'); T('angle/1', 'base rad to output deg/1');
     T('base rad per s to output rpm/1', 'speed_rpm/1'); T('base rad to output deg/1', 'angle_output_deg/1');
     % the Arduino and its sensors, shared with servo_identified (the encoder reads the output angle)
+    simulink_scope(mdl, 'Scope: current', {{'Current limit/1'}}, {'motor current (A)'}, [1600 300]);
     simulink_name_signal([mdl '/Current limit'], 1, 'current (A)');
     simulink_name_signal([mdl '/w'], 1, 'speed (base rad/s)');
     io = simulink_servo_io(mdl, 'output rpm to base rad per s/1', 'base rad per s to output rpm/1', 'base rad to output deg/1');

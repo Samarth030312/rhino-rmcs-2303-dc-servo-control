@@ -109,8 +109,9 @@ the same linear equations.
 
 **From the app.** Choose a mission, a preset and the plant (PLANT menu), then **OPEN IN
 SIMULINK**: the matching model opens with every current setting (gains, Ts, limit, latency,
-feedback path, setpoint profile, load). Press Run in Simulink. Edit blocks freely; `build_*`
-restores the generated version.
+feedback path, setpoint profile, load). Press Run in Simulink: a scope opens with the setpoint
+against the measurement and the command (and, in the two physics models, the motor current).
+Edit blocks freely; `build_*` restores the generated version.
 
 **From a script.** Every preset of every mission is in `servolab.motor.presets`:
 

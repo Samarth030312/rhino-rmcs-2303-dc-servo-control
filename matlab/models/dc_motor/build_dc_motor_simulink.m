@@ -101,6 +101,8 @@ function mdl = build_dc_motor_simulink(outDir)
     T('loopSel/1', 'Measured/1'); T('to rpm/1', 'Measured/2'); T('Sample/1', 'Measured/3');
     T('Measured/1', 'Error/2'); T('Measured/1', 'measured/1');
 
+    simulink_scope(mdl, 'Scope', {{'Setpoint/1', 'Measured/1'}, {'CL or OL/1'}, {'DC motor/3'}}, ...
+        {'setpoint and measured (rpm or deg)', 'armature voltage (V)', 'armature current (A)'}, [1100 20]);
     simulink_tidy(mdl);
 
     note = Simulink.Annotation([mdl '/note']);
