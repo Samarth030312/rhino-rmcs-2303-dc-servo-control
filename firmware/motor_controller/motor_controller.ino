@@ -122,6 +122,8 @@ struct LoopStats {                               // micros() statistics of the c
   uint32_t sampleSum = 0, sampleMax = 0;         // whole sample incl. Modbus and telemetry
 } stats;
 float lastSpeedAbs = 0;                          // |speed| at the previous sample
+float cmdEnv = 0;                                // |command|, falling no faster than the drive's ramp
+const float DRIVE_RAMP_OUT = 50.0f;              // output rpm/s: acceleration register 5000 base rpm/s
 float piI = 0, piD = 0, piE = 0;  // controller state
 bool piFirst = true;
 
@@ -322,7 +324,7 @@ static void handleLine(char *line) {
     if (!slaveId) { err(t, 5, "no drive: check 12 V and wiring D8/D9/GND"); return; }
     if (flags & F_ESTOP) { err(t, 6, "estopped: power-cycle or HOME"); return; }
     stopping = false;                                  // a stop still ramping: the RUN sequence takes over
-    resetController(); seq = 0; flags = 0; lastDir = 0; lastCmd = 0; runawayCount = 0; haveCounts = false; lastSpeedAbs = 0;
+    resetController(); seq = 0; flags = 0; lastDir = 0; lastCmd = 0; runawayCount = 0; haveCounts = false; lastSpeedAbs = 0; cmdEnv = 0;
     stats = LoopStats();
     // The drive keeps LPR in RAM: after its own power cycle it reloads the saved value (334 on
     // the lab drive, seen 2026-10-11). Wrong LPR scales every speed by 334/13 = 25.7: enforce 13
@@ -444,7 +446,10 @@ static void controlSample() {
   }
   if (running && !isnan(speedNow)) {
     bool wrongWay = (lastCmd > 5 && speedNow < -10) || (lastCmd < -5 && speedNow > 10);
-    bool tooFast = fabs(speedNow) > 2.0f * fabs(lastCmd) + 40.0f;
+    // "too fast" against the command as the drive can follow it: after a commanded slow-down the
+    // motor is still answering (~0.15 s) and then ramps at 50 rpm/s (-150 -> 0 rpm: MOTOR-R0134)
+    cmdEnv = max(fabs(lastCmd), cmdEnv - DRIVE_RAMP_OUT * cfg.Ts);
+    bool tooFast = fabs(speedNow) > 2.0f * cmdEnv + 40.0f;
     // A commanded reversal or slow-down passes through these states while the drive ramps
     // (5000 base rpm/s = 50 output rpm/s on the lab drive), but then |speed| is falling.
     // A runaway holds or gains speed. Only count samples where |speed| is not falling.

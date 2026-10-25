@@ -12,6 +12,7 @@
 #include "Arduino.h"
 #include "AltSoftSerial.h"
 #include <map>
+#include <deque>
 #include <vector>
 
 #include <chrono>
@@ -55,6 +56,8 @@ struct Drive {
   bool encoderReversed = false;              // wiring fault: drive sees -speed and runs away
   bool coarseSpeed = false;                  // speed register in 461.5 base-rpm steps (4.6 output rpm), as on the lab drive
   double speedAtOff = 0;                     // base rpm when motor power was last switched off (0x0700)
+  double deadMs = 0, now = 0;                // dead time between a command and the motor's response
+  std::deque<std::pair<double, double>> targets;
   std::string line; int frames = 0, writes = 0;
   std::string injectAfterNextFrame;          // a late reply from another slave, delivered right after a request
   std::vector<uint16_t> modeHistory;
@@ -63,6 +66,9 @@ struct Drive {
     if ((m >> 8) == 1 && (m & 1)) target = (m & 8) ? -(double)reg[14] : reg[14];
     if (encoderReversed && target != 0) target = (target > 0 ? -1 : 1) * 16600.0;   // flat out, wrong way
     if (encoderReversed && m == 0x0701) target = -16600.0;   // "hold position" with reversed encoder runs away (2026-10-11)
+    now += dt_ms; targets.push_back({now, target});
+    while (targets.size() > 1 && targets[1].first <= now - deadMs) targets.pop_front();
+    target = targets.front().second;
     // the lab drive's acceleration register (5000) as a ramp limit in base rpm/s, then a 50 ms lag
     double maxStep = 5000.0 * dt_ms / 1000.0;
     if (target > ramp + maxStep) ramp += maxStep; else if (target < ramp - maxStep) ramp -= maxStep; else ramp = target;
@@ -290,6 +296,20 @@ int main(int argc, char **argv) {
     send("CFG,1,S,OL,0,0,0,10,100,180"); send("SET,1,20"); send("RUN,1"); runFor(300, true);
     CHECK(emu.reg[10] == 13, "RUN restores LPR 13 after a drive power cycle");
     send("STOP,1"); runFor(200, false);
+  }
+  // a commanded slow-down from full speed must NOT trip the runaway guard: the lab drive answers
+  // after ~0.15 s and then ramps at 50 rpm/s, so for a while |speed| is far above the new command
+  // (MOTOR-R0134, 2026-10-25: -150 -> 0 rpm, 150.0, 148.4, 147.4 rpm -> false "too fast")
+  {
+    emu.powered = true; emu.id = 7; emu.deadMs = 150;
+    send("HOME,1"); runFor(200, false);
+    send("CFG,1,E,OL,0,0,0,10,100,180"); send("SET,1,-150"); send("RUN,1");
+    size_t m0 = Serial.out.size(); runFor(5000, true);
+    send("SET,1,0"); runFor(4000, true);
+    std::string tl = Serial.out.substr(m0);
+    CHECK(tl.find("runaway") == std::string::npos && emu.reg[2] != 0x0700, "commanded slow-down -150 -> 0 rpm (0.15 s dead time) does not trip the runaway guard");
+    send("STOP,1"); runFor(2000, false);
+    emu.deadMs = 0;
   }
   // a commanded reversal must NOT trip the runaway guard (drive ramps through 'wrong way')
   {
