@@ -24,6 +24,13 @@ function mdl = build_motor_identified_simulink(outDir)
     cleanup = onCleanup(@() close_system(mdl, 0));
     set_param(mdl, 'SolverType', 'Fixed-step', 'Solver', 'ode1', 'FixedStep', 'dt', 'StopTime', 'Tend', ...
               'SaveOutput', 'on', 'SaveFormat', 'Dataset', 'SaveTime', 'on');
+    % parameters first: a block's expression (R, J, ...) must never resolve to a variable of the same name in the base workspace
+    m = struct('K', 1, 'tau', 0.1, 'theta', 0, 'acc', 50, 'dz', 0, 'qSpd', 4.615, 'backlash', 0, 'sensorAtLoad', false);
+    c = servolab.motor.defaultConfig('rig', 'speed');
+    w = motor_identified_simulink_params(m, c, [0 c.setpoint], 5);
+    mws = get_param(mdl, 'ModelWorkspace');
+    f = fieldnames(w);
+    for i = 1:numel(f), assignin(mws, f{i}, w.(f{i})); end
 
     B = @(lib, name, pos, varargin) add_block(lib, [mdl '/' name], 'Position', pos, varargin{:});
     % ------------------------------------------------------------ Arduino (sampled)
@@ -97,12 +104,6 @@ function mdl = build_motor_identified_simulink(outDir)
         'Set parameters with run_motor_identified_simulink(m, c, profile, Tend).'];
     note.Position = [20 400 900 430];
 
-    m = struct('K', 1, 'tau', 0.1, 'theta', 0, 'acc', 50, 'dz', 0, 'qSpd', 4.615, 'backlash', 0, 'sensorAtLoad', false);
-    c = servolab.motor.defaultConfig('rig', 'speed');
-    w = motor_identified_simulink_params(m, c, [0 c.setpoint], 5);
-    mws = get_param(mdl, 'ModelWorkspace');
-    f = fieldnames(w);
-    for i = 1:numel(f), assignin(mws, f{i}, w.(f{i})); end
     if ~exist(outDir, 'dir'), mkdir(outDir); end
     save_system(mdl, fullfile(outDir, [mdl '.slx']));
 end

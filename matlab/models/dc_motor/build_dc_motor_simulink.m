@@ -28,6 +28,8 @@ function mdl = build_dc_motor_simulink(outDir)
     cleanup = onCleanup(@() close_system(mdl, 0));
     set_param(mdl, 'Solver', 'ode45', 'RelTol', '1e-8', 'AbsTol', '1e-10', 'MaxStep', '1e-3', ...
               'StopTime', 'Tend', 'SaveOutput', 'on', 'SaveFormat', 'Dataset', 'SaveTime', 'on');
+    % parameters first: a block's expression (R, J, ...) must never resolve to a variable of the same name in the base workspace
+    setWorkspace(mdl, servolab.motor.defaultConfig('bare', 'speed'));
 
     % ------------------------------------------------------------- top level
     B = @(lib, name, pos, varargin) add_block(lib, [mdl '/' name], 'Position', pos, varargin{:});
@@ -109,8 +111,6 @@ function mdl = build_dc_motor_simulink(outDir)
         'Set them with run_dc_motor_simulink(cfg); do not edit numbers by hand.'];
     note.Position = [30 390 700 420];
 
-    % ------------------------------------------------------------- parameters
-    setWorkspace(mdl, servolab.motor.defaultConfig('bare', 'speed'));
     if ~exist(outDir, 'dir'), mkdir(outDir); end
     save_system(mdl, fullfile(outDir, [mdl '.slx']));
 end
