@@ -68,7 +68,7 @@ sequenceDiagram
     participant Drv as RMCS-2303
     App->>Uno: $CFG (loop, law, gains, Ts, limit)
     App->>Uno: $SET setpoint, $RUN
-    Uno->>Drv: LPR = 13, HOME, settle 150 ms, speed 0, mode CW
+    Uno->>Drv: LPR = 13, HOME, wait until the count reads zero, speed 0, mode CW
     loop every Ts
         Uno->>Drv: read speed register (or encoder counts)
         Uno->>Uno: e = r − y;  u = PID(e), clamped to ±uMax

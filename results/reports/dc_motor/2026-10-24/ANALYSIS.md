@@ -21,10 +21,11 @@ Counted from every session log (`results/evidence/logs/hw_session_*.log`), which
 | `8e478f9` | 2 | 27 | 3 | **0** | 1 | 45.9 | 24.0 |
 | `a04ae3c` | 1 | 18 | 1 | **0** | 0 | 45.1 | 18.0 |
 | `886b32c` | 1 | 27 | 3 | **0** | 0 | -36.9 | 27.0 |
+| `39f9bdf` | 1 | 8 | 0 | **0** | 0 | - | - |
 
 Before the fix: **12 of 12** at-risk starts ran away. After it: **0 of 29**. Every runaway ran the motor backwards at full voltage within 0.1 s (the drive's 53 rpm/s ramp was bypassed), and the guard cut motor power within 0.2 s every time. The cause inside the drive is UNVERIFIED; the fix rests on this record.
 
-What remains at enable: the first sample reads tens of rpm backwards, mostly because the HOME resets the count the speed is computed from; the encoder shows a real jerk (largest count excursion in the first 0.5 s, last column; 1 count = 0.069 deg). It never came near the guard's limits.
+What remains at enable: in the logs, the first encoder-speed sample reads tens of rpm with the motor at rest. The drive zeroes its position count some time after HOME, and the firmware took its reference count before that, so the first difference spanned the reset (firmware 8ea43d3 waits for the reset and reports the first sample as 0; `loadHardwareRun` applies the same rule to older runs, so the scores below are not affected). The encoder also shows a real jerk (largest count excursion in the first 0.5 s, last column; 1 count = 0.069 deg). Neither came near the guard's limits.
 
 ![start transients](a_start_transients.png)
 
@@ -43,11 +44,11 @@ RMSE between the rig's measurement and the model's measurement at the same contr
 | speed (drive) | OL | 20 | 5.30 rpm | 7.14 rpm | 0.90 / 0.80 | 7.5 / 0.0 |
 | speed (drive) | P | 6 | 3.59 rpm | 4.37 rpm | - / - | 0.0 / 0.0 |
 | speed (drive) | PI | 5 | 3.23 rpm | 4.08 rpm | 0.80 / 0.60 | 10.7 / 1.5 |
-| speed (encoder) | I | 13 | 1.34 rpm | 4.29 rpm | 0.40 / 0.60 | 3.1 / 0.0 |
-| speed (encoder) | OL | 14 | 4.88 rpm | 6.31 rpm | 0.90 / 0.90 | 3.6 / 0.0 |
-| speed (encoder) | PI | 7 | 3.22 rpm | 4.58 rpm | 0.40 / 0.50 | 0.0 / 0.0 |
+| speed (encoder) | I | 13 | 1.28 rpm | 2.64 rpm | 0.40 / 0.60 | 2.7 / 0.0 |
+| speed (encoder) | OL | 14 | 1.76 rpm | 4.64 rpm | 0.90 / 0.90 | 3.6 / 0.0 |
+| speed (encoder) | PI | 7 | 2.54 rpm | 4.57 rpm | 0.40 / 0.50 | 0.0 / 0.0 |
 
-Relative to the largest setpoint of each run, the median RMSE is **5.5 %** (worst 24.0 %, `MOTOR-R0051_M7`). Part of every speed RMSE is quantisation: the drive register moves in 4.6 rpm steps and encoder speed in 0.115 rpm steps at Ts 0.1 s. The same quantisation makes the open-loop "overshoot" of 7.5 % on the register: one step above 60 rpm.
+Relative to the largest setpoint of each run, the median RMSE is **4.6 %** (worst 24.0 %, `MOTOR-R0051_M7`). Part of every speed RMSE is quantisation: the drive register moves in 4.6 rpm steps and encoder speed in 0.115 rpm steps at Ts 0.1 s. The same quantisation makes the open-loop "overshoot" of 7.5 % on the register: one step above 60 rpm.
 
 ![model accuracy](a_model_accuracy.png)
 
@@ -59,20 +60,20 @@ Each row: one run of one experiment repeated across the sessions (FINISHED runs 
 | Open-loop reversal, +30 to -30 rpm | 1 | 2 | 0.40 ± 0.00 | 7.5 ± 0.0 | -0.16 ± 0.33 | 4.43 |
 | Open-loop speed steps, 20 to 120 rpm | 1 | 4 | 0.20 ± 0.00 | 55.2 ± 81.0 | -0.14 ± 0.38 | 4.78 |
 | Open-loop step 0 -> 60 rpm | 1 | 14 | 0.94 ± 0.06 | 7.5 ± 0.0 | 0.18 ± 0.70 | 4.95 |
-| Open-loop step 0 -> 60 rpm | 2 | 8 | 0.91 ± 0.04 | 2.6 ± 0.8 | 0.12 ± 0.04 | 5.61 |
+| Open-loop step 0 -> 60 rpm | 2 | 8 | 0.91 ± 0.04 | 2.6 ± 0.8 | 0.12 ± 0.04 | 2.85 |
 | Position P final error on 10 deg moves (Kp 0.1 / 0.3 / 1.0) | 1 | 3 | 3.30 ± 0.15 | 2.2 ± 1.1 | -0.01 ± 0.24 | 0.41 |
 | Position P final error on 10 deg moves (Kp 0.1 / 0.3 / 1.0) | 2 | 3 | 0.80 ± 0.09 | 2.5 ± 1.8 | 0.05 ± 0.21 | 0.60 |
 | Position P final error on 10 deg moves (Kp 0.1 / 0.3 / 1.0) | 3 | 5 | 0.25 ± 0.09 | 73.4 ± 10.4 | 0.29 ± 0.23 | 2.04 |
-| Speed I only, Ki sweep 0.5 / 1 / 2 / 4 | 1 | 3 | 4.10 ± 0.00 | 11.6 ± 18.8 | 0.34 ± 0.03 | 1.85 |
-| Speed I only, Ki sweep 0.5 / 1 / 2 / 4 | 2 | 3 | 1.83 ± 0.06 | 2.4 ± 0.9 | -0.01 ± 0.02 | 0.97 |
-| Speed I only, Ki sweep 0.5 / 1 / 2 / 4 | 3 | 3 | 0.40 ± 0.00 | 2.5 ± 0.9 | 0.00 ± 0.02 | 1.35 |
-| Speed I only, Ki sweep 0.5 / 1 / 2 / 4 | 4 | 4 | 0.40 ± 0.00 | 65.4 ± 0.8 | -0.01 ± 0.03 | 2.64 |
+| Speed I only, Ki sweep 0.5 / 1 / 2 / 4 | 1 | 3 | 4.23 ± 0.23 | 0.5 ± 0.9 | 0.34 ± 0.03 | 0.90 |
+| Speed I only, Ki sweep 0.5 / 1 / 2 / 4 | 2 | 3 | 1.83 ± 0.06 | 2.4 ± 0.9 | -0.01 ± 0.02 | 0.90 |
+| Speed I only, Ki sweep 0.5 / 1 / 2 / 4 | 3 | 3 | 0.40 ± 0.00 | 2.5 ± 0.9 | 0.00 ± 0.02 | 1.29 |
+| Speed I only, Ki sweep 0.5 / 1 / 2 / 4 | 4 | 4 | 0.40 ± 0.00 | 65.4 ± 0.8 | -0.01 ± 0.03 | 2.61 |
 | Speed P gain sweep (Kp 0.2 / 0.5 / 0.8) | 1 | 2 | - ± - | 0.0 ± 0.0 | 49.98 ± 0.82 | 2.35 |
 | Speed P gain sweep (Kp 0.2 / 0.5 / 0.8) | 2 | 2 | - ± - | 0.0 ± 0.0 | 40.29 ± 0.19 | 3.59 |
 | Speed P gain sweep (Kp 0.2 / 0.5 / 0.8) | 3 | 2 | - ± - | 0.0 ± 0.0 | 33.40 ± 0.21 | 4.28 |
 | Speed PI designed for zeta 0.7 on a first-order model (Kp 1.0, Ki 2.9) | 1 | 3 | 0.40 ± 0.00 | 32.0 ± 0.5 | -0.18 ± 0.01 | 4.48 |
 | Speed PI tracking setpoint changes (Kp 0.3, Ki 1.5) | 1 | 4 | 0.80 ± 0.16 | 8.4 ± 4.6 | 0.11 ± 0.45 | 3.49 |
-| Saturation and windup | 1 | 4 | - ± - | 0.0 ± 0.0 | 30.06 ± 0.05 | 2.52 |
+| Saturation and windup | 1 | 4 | - ± - | 0.0 ± 0.0 | 30.06 ± 0.05 | 2.02 |
 
 ![repeatability](a_repeatability.png)
 
@@ -101,8 +102,8 @@ The rig has not drifted in 13 days if the refit stays within the run-to-run spre
 | `MOTOR-R0110_M1` | speed (drive) | OL | 0.000 | 4.99 | 4.99 |
 | `MOTOR-R0070_M3` | speed (drive) | P | 0.000 | 4.37 | 4.37 |
 | `MOTOR-R0111_M5` | speed (drive) | PI | 0.000 | 4.08 | 4.08 |
-| `MOTOR-R0074_M4` | speed (encoder) | I | 0.000 | 2.66 | 2.66 |
+| `MOTOR-R0074_M4` | speed (encoder) | I | 0.000 | 2.62 | 2.62 |
 | `MOTOR-R0108_M1` | speed (encoder) | OL | 0.000 | 4.64 | 4.64 |
-| `MOTOR-R0112_M6` | speed (encoder) | PI | 0.000 | 3.16 | 3.16 |
+| `MOTOR-R0112_M6` | speed (encoder) | PI | 0.000 | 2.54 | 2.54 |
 
 Compared at the controller samples. The two implementations of the same model (`identifiedSim` in MATLAB, the .slx in Simulink) give the listed difference; their RMSE against the rig differs only where the rig's samples fall between the model's.

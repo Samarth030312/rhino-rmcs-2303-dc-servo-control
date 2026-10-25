@@ -26,7 +26,7 @@ measurable at the 100 ms sampling. These numbers were fitted to four open-loop r
 2026-10-11 (`servolab.motor.rigModel`, [first principles §2](FIRST_PRINCIPLES.md)). The model
 adds what the Arduino adds: its PID law, the Modbus latency (70 ms for speed, 110 ms for
 position, both measured) and the quantised measurements. It predicts runs it was not fitted
-to within a median 5.5-6.3 % of the setpoint over 162 runs ([results](RESULTS.md)). It has no
+to within a median 4.6-5.5 % of the setpoint over 169 runs ([results](RESULTS.md)). It has no
 current, no torque and no load: the identification had none to fit.
 
 **2. What happens under a load, with more inertia, or on a flat battery?

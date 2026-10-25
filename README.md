@@ -47,7 +47,7 @@ step: **[the sequence](docs/SEQUENCE.md)**.
 
 ## What the rig showed
 
-From 193 recorded runs on four days, 2026-10-11 to -25 (analyses of
+From 201 recorded runs on four days, 2026-10-11 to -25 (analyses of
 [2026-10-23 and -24](results/reports/dc_motor/2026-10-24/ANALYSIS.md) and
 [2026-10-25](results/reports/dc_motor/2026-10-25/ANALYSIS.md)):
 
@@ -55,7 +55,7 @@ From 193 recorded runs on four days, 2026-10-11 to -25 (analyses of
   speed has a slope of 0.997 with no dead zone down to 2 rpm, in both directions.
 - **A step is the drive's ramp, not a time constant.** The speed rises at a fixed 53 rpm/s.
   A model made of that ramp, the 70 ms Modbus latency and the 100 ms sampling predicts runs
-  it never saw: median error 5.5 % of the setpoint over 83 runs, and 6.3 % over 79 more a day
+  it never saw: median error 4.6 % of the setpoint over 83 runs, and 5.5 % over 86 more a day
   later. Refitted 13 and 14 days after the fit, it had not moved (gain 1.002 and 1.003, ramp
   53.9 and 53.3 rpm/s, against 1.000 and 53.4).
 - **The delay decides the controller.** The textbook ζ 0.7 PI design overshoots 32 % (±0.5
@@ -126,12 +126,16 @@ The controller law is the same line by line in the firmware (`pidStep` in C) and
 ## Status
 
 - **On the rig:** every experiment of missions M1-M9 (open loop, static map, speed P / I / PI,
-  windup, position P / I / PI), 193 runs on four days. Release acceptance on 2026-10-25 with the final
-  firmware `886b32c`: every experiment of M1-M9, 27 of 27 runs without a fault
+  windup, position P / I / PI), 201 runs on four days. Release acceptance on 2026-10-25 with firmware
+  `886b32c`: every experiment of M1-M9, 27 of 27 runs without a fault
   ([report](results/reports/dc_motor/2026-10-25/REPORT.md)).
 - **Fixed and verified on the rig:** the reverse runaway at start (HOME at every RUN); the soft
   stop at the end of a run (the motor ramps to rest before power goes off: no jolt); the bridge
   to the drive (registers read through it equal DRIVE CHECK's).
+- **Fixed, tested against the emulated drive, not yet on the rig:** firmware `8ea43d3` waits for
+  the drive to zero its count after HOME, so an encoder-speed run no longer starts with a false
+  10-46 rpm sample (in 34 of 72 such runs). Older runs are corrected on reading
+  ([results](docs/RESULTS.md#found-in-free-runs-2026-10-25)).
 - **Not yet run:** the Rhino configuration software itself through the bridge (needs a Windows
   PC with the rig; [procedure](docs/RHINO_SOFTWARE.md)).
 - **Simulation:** all 39 presets, and every rig experiment also on the drive physics (71 cases),

@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.1 (2026-10-25): what free runs on the rig showed
+
+- **App:** the live plot hid the start of a run longer than the one before it; fixed, and the
+  end-to-end test now covers it. Saved data were never affected.
+- **Firmware `8ea43d3`:** waits for the drive to zero its count after HOME; the first
+  encoder-speed sample is 0, as in the models. It read 10-46 rpm at rest in 34 of 72 runs.
+  Tested against an emulated drive that resets late; not yet flashed on the rig.
+- **Data:** older runs are read with the same rule (`loadHardwareRun`, raw files unchanged); the
+  model's median error over 2026-10-23 and 24 is 4.6 %, not 5.5 %.
+- **Simulink:** every model has a scope that opens on Run, with labelled signals.
+- `motor_session_report` takes an end time, so a report covers its session only.
+
 ## 1.1.0 (2026-10-25): every experiment in Simulink; one experiment catalogue
 
 - **Three Simulink models, one per plant.** New `servo_drive_physics` (the rig from datasheet

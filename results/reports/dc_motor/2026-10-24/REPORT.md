@@ -64,7 +64,7 @@ More Ki, less damping, as the theory says; the identified model (with the 70 ms 
 ![I sweep](speed_i_sweep.png)
 
 ## Speed PI designed for zeta 0.7 (Kp 1.0, Ki 2.9)
-First step 0 -> 30 rpm: overshoot **31.4 %** on the rig, 25.8 % in the model; the textbook design predicted 4.6 %. After it the loop does not settle: it holds a **limit cycle of +/- 6.4 rpm at 30 rpm and +/- 6.5 rpm at 40 rpm** (model RMSE 4.65 rpm, the model shows the same cycle). The design ignored the 70 ms Modbus latency and the 100 ms sampling; with them, Kp = 1.0 on encoder speed leaves too little phase margin. A design for this rig must include the delay (or use a lower Kp: the hand-tuned Kp 0.3, Ki 1.5 settles).
+First step 0 -> 30 rpm: overshoot **31.4 %** on the rig, 25.8 % in the model; the textbook design predicted 4.6 %. After it the loop does not settle: it holds a **limit cycle of +/- 6.4 rpm at 30 rpm and +/- 6.5 rpm at 40 rpm** (model RMSE 4.64 rpm, the model shows the same cycle). The design ignored the 70 ms Modbus latency and the 100 ms sampling; with them, Kp = 1.0 on encoder speed leaves too little phase margin. A design for this rig must include the delay (or use a lower Kp: the hand-tuned Kp 0.3, Ki 1.5 settles).
 
 ![PI design](speed_pi_design.png)
 

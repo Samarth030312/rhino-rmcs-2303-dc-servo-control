@@ -7,7 +7,7 @@ refit, Simulink). Full reports: [2026-10-23](../results/reports/dc_motor/2026-10
 [2026-10-24](../results/reports/dc_motor/2026-10-24/REPORT.md) ·
 [analysis of both](../results/reports/dc_motor/2026-10-24/ANALYSIS.md) ·
 [2026-10-25, release acceptance](../results/reports/dc_motor/2026-10-25/REPORT.md) and its
-[analysis](../results/reports/dc_motor/2026-10-25/ANALYSIS.md) (81 runs: model RMSE 6.3 % of the
+[analysis](../results/reports/dc_motor/2026-10-25/ANALYSIS.md) (89 runs: model RMSE 5.5 % of the
 setpoint, median; refit K 1.003, ramp 53.3 rpm/s: no drift in 14 days).
 Grey in every figure is the identified model running the run's own settings. It was fitted
 on 2026-10-11 data only, so every comparison below is a **prediction**.
@@ -41,8 +41,8 @@ on 2026-10-11 data only, so every comparison below is a **prediction**.
 
 ## How good the model is
 
-Over 83 finished runs of 2026-10-23 and 24, median error **5.5 % of the run's largest
-setpoint**; over 79 of 2026-10-25, **6.3 %**. Part of every speed error is quantisation (the drive register reads in 4.6 rpm
+Over 83 finished runs of 2026-10-23 and 24, median error **4.6 % of the run's largest
+setpoint**; over 86 of 2026-10-25, **5.5 %**. Part of every speed error is quantisation (the drive register reads in 4.6 rpm
 steps). Overshoot and rise time, rig against model:
 
 ![model accuracy](../results/reports/dc_motor/2026-10-24/a_model_accuracy.png)
@@ -69,6 +69,25 @@ Verified on the rig on 2026-10-25 ([report](../results/reports/dc_motor/2026-10-
   drive's ramp. Real runaways still stop within 0.2 s (tested against the emulated drive).
 - **Bridge.** Registers read through it with raw Modbus equal those DRIVE CHECK reads.
 
+## Found in free runs, 2026-10-25
+
+Eight runs made by hand in the app after the acceptance (R0194-R0201: M2, M4-M9, LAB), firmware
+`39f9bdf`: all finished, no fault, every one ended with a soft stop, longest app stall 0.69 s.
+They showed two faults, both in how the rig was *observed*, not in how it was controlled:
+
+- **The live plot hid the start of a run.** It drew a run only from as many frames as the
+  previous run had (M8 after the 51-frame M7: nothing before 7.65 s). The saved data were
+  complete. Fixed in the app; the end-to-end test now runs a longer run after a shorter one.
+- **The first encoder-speed sample was false.** R0200 (speed I, Ki 0.5) scored 38 % overshoot
+  against the model's 0 %: its first sample read 41.5 rpm with the motor at rest, then 1.8 rpm.
+  The drive zeroes its position count some time after HOME; the firmware took its reference
+  count before that, so the first difference spanned the reset. 34 of the 72 encoder-speed runs
+  on record start this way (10-46 rpm). Firmware `8ea43d3` waits for the reset and reports the
+  first sample as 0, as the models always did (tested against an emulated drive that resets
+  late; the old firmware reads 46 rpm there). Older runs are read with the same rule
+  (`servolab.motor.loadHardwareRun`), which moved the model's median error over 2026-10-23 and 24
+  from 5.5 % to 4.6 %: part of what looked like model error was this sample.
+
 ## Simulation
 
 All 39 presets, and every rig experiment also on the drive physics (71 cases), run in the
@@ -77,6 +96,8 @@ MATLAB simulator and in Simulink without an error, and agree to 1e-10 or better
 
 ## Open
 
+- Firmware `8ea43d3` on the rig: flash it and run M1 (encoder step), M4 and M7; the first
+  samples must read 0.
 - The Rhino configuration software itself, through the bridge (needs a Windows PC with the rig).
 - The drive's current limit: 3 A (manual) or 5 A (product page), conflict C-M7.
 - [All open items](knowledge-base/OPEN_ITEMS.md).

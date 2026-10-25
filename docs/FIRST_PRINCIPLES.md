@@ -123,5 +123,5 @@ model's error on every position run ([analysis](../results/reports/dc_motor/2026
 The bare-motor physics (section 1) is right about free speed, torque and current, and it is
 the right model for M10. It is the wrong model for M1–M9: the drive's loop sits in between.
 The identified model (sections 2–3) has four numbers, all measured on the rig, and predicts
-runs it was never fitted to within a median 5.5 % of the setpoint. When your rig differs
+runs it was never fitted to within a median 4.6-5.5 % of the setpoint. When your rig differs
 (another battery, a load on the shaft), identify it from one of its own open-loop runs.

@@ -33,9 +33,9 @@ $<TYPE>,<version>,<field1>,…,<fieldN>*<CS>\n
 | Frame | Meaning |
 |---|---|
 | `$PING,1` | Keep-alive. Sent by the host every 0.25 s while running. |
-| `$CFG,1,<loop>,<ctrl>,<Kp>,<Ki>,<Kd>,<Tf_ms>,<Ts_ms>,<umax_rpm>` | loop `S` speed / `P` position; ctrl `OL` `P` `I` `PI` `PID`; gains in the units of `CONTROL_THEORY.md` §5 |
-| `$SET,1,<setpoint>` | Output rpm (S) or output degrees (P) |
-| `$RUN,1` | Reset t and seq to 0, start the loop and telemetry |
+| `$CFG,1,<loop>,<ctrl>,<Kp>,<Ki>,<Kd>,<Tf_ms>,<Ts_ms>,<umax_rpm>` | loop `S` speed from the drive's register / `E` speed from encoder counts / `P` position; ctrl `OL` `P` `I` `PI` `PID`; gains in the units of `CONTROL_THEORY.md` §5 |
+| `$SET,1,<setpoint>` | Output rpm (S, E) or output degrees (P); may change while running |
+| `$RUN,1` | Reset t and seq to 0; LPR ← 13 if the drive lost it; HOME, then wait (≤ 0.5 s) until the drive's count reads zero; speed 0; start the loop and telemetry. The first encoder-speed sample is 0 (the reference count). |
 | `$STOP,1` | End the run. A turning motor is first brought to rest on the drive's own ramp (speed register ← 0, at most 4 s, `# soft stop: … ms` line), then register 2 ← 0x0700: **motor power off**, shaft free. Never 0x0701 (hold): with a reversed encoder it runs away (2026-10-11). |
 | `$STOP,1,NOW` | End the run and switch motor power off at once (register 2 ← 0x0700): the app's ABORT. |
 | `$BRIDGE,1` | Motor power off, then the Uno becomes a transparent USB ↔ drive link at **9600 baud 8N1** for the manufacturer's configuration software. Kept in EEPROM: survives resets (opening a port resets a CH340 Uno). The firmware's watchdog and guards are not active. |
@@ -44,9 +44,6 @@ $<TYPE>,<version>,<field1>,…,<fieldN>*<CS>\n
 | `$HOME,1` | Set home (register 2 ← 0x0800). Only when stopped. Also clears the E-STOP latch. |
 | `$DIAG,1` | Read and print the drive registers as `#` lines (MOTOR-01). Only when stopped. |
 
-Temperature board: `$CFG,1,<ONOFF|HYST|MA|P|TPROP>,<setpoint>,<hyst>,<window>,<Kp>,<tprop_ms>`.
-Level board: `$CFG,1,<ONOFF|P|PI>,<Lmin>,<Lmax>,<setpoint>,<Kp>,<Ki>` and `$CAL,1,<sensor_to_floor_cm>,<full_cm>`.
-Both accept `$RUN`, `$STOP`, `$SET`, `$PING`.
 
 Device answers every command with `$ACK,1,<TYPE>` or `$ERR,1,<TYPE>,<code>,<text>`.
 
@@ -57,24 +54,27 @@ Device answers every command with `$ACK,1,<TYPE>` or `$ERR,1,<TYPE>,<code>,<text
 | `$HELLO,1,<fw_name>,<git_rev>,<slave_id>` | Sent once after reset |
 | `$TEL,1,<seq>,<t_ms>,<loop>,<ctrl>,<setpoint>,<meas>,<err>,<u>,<pos_counts>,<spd_base_rpm>,<flags>` | One per control sample |
 
-`TEL` units: setpoint / meas / err in output rpm (S) or output degrees (P); `u` = speed command
+`TEL` units: setpoint / meas / err in output rpm (S, E) or output degrees (P); `u` = speed command
 in **output** rpm (the firmware multiplies by 100 before writing register 14); `pos_counts` =
 drive position feedback (5200 / output rev); `spd_base_rpm` = drive register 24 as read.
 `flags` (hex): bit0 RUNNING, bit1 SATURATED, bit2 MODBUS_TIMEOUT, bit3 MODBUS_LRC_ERROR,
 bit4 ESTOPPED, bit5 SPEED_CLAMPED, bit6 WATCHDOG_STOP, bit7 OVERRUN (sample took longer than Ts).
 
-`$TTEL,1,<seq>,<t_ms>,<mode>,<setpoint>,<temp_raw>,<temp_filt>,<err>,<u>,<heater>,<flags>` and
-`$LTEL,1,<seq>,<t_ms>,<mode>,<setpoint>,<level_cm>,<level_pct>,<err>,<u>,<pump>,<flags>`:
-field lists and flag bits in `matlab/functions/+servolab/+protocol/schema.m` (the single source).
+Field lists and flag bits: `matlab/functions/+servolab/+protocol/schema.m` (the single source).
 
-## 5. Safety behaviour required of the firmware
+## 5. What the firmware does on its own
 
-1. **Watchdog**: while running, if no frame arrives from the host for **1.0 s**, send drive STOP,
-   set WATCHDOG_STOP, stop the loop. A hung MATLAB therefore stops the motor.
-2. Clamp |command| to 18000 base rpm (and lower if the supply is 24 V, C-M6); set SPEED_CLAMPED.
-3. On any Modbus timeout during a run: STOP, set MODBUS_TIMEOUT, report `$ERR`.
-4. At reset: drive disabled until `RUN`.
-5. Never print anything that is not a frame or a `#` line.
+1. **Host watchdog**: while running, if no frame arrives from the host for **2 s**, motor power
+   off, WATCHDOG_STOP, `$ERR,1,RUN,10,host silent >2 s`. A hung or closed MATLAB stops the motor;
+   2 s leaves room for MATLAB's longest measured stall (0.93 s).
+2. **Runaway guard** (speed loops, and position by its count rate): two samples in a row moving
+   the wrong way, or faster than twice the command as the drive can follow it plus 40 rpm →
+   E-STOP, `$ERR,1,RUN,11,runaway: …`. A wrong-way *and* too-fast sample stops at once.
+3. **Modbus loss**: any unanswered read during a run → motor power off, `$ERR,1,RUN,8`.
+4. **Soft stop** on `STOP` (see §3); `STOP,NOW`, `ESTOP` and the D4 button cut power at once.
+5. Clamp |command| to the drive's 18000 base rpm; set SPEED_CLAMPED.
+6. At reset: motor power off until `RUN`. Never the drive's hold mode (0x0701).
+7. Never print anything that is not a frame or a `#` line.
 
 The physical E-stop is the power switch. Software stop is a convenience, not a safety function.
 
