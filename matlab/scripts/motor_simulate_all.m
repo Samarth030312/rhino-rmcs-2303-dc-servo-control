@@ -9,12 +9,16 @@ function T = motor_simulate_all(outFile)
 %   servolab.motor.stepMetrics; with Simulink installed it is also run in the plant's Simulink
 %   model (servolab.motor.runSimulink) and the largest difference of the measured signal and of
 %   the command at the controller samples is reported. An "all runs" entry is covered by its
-%   single runs. Errors are recorded per row, not thrown, so one table shows everything.
+%   single runs; a rig experiment is also run on the drive physics (plant 'rigPhys'). Errors are
+%   recorded per row, not thrown, so one table shows everything.
     if nargin < 1, outFile = fullfile(servolab.repoRoot(), 'results', 'tables', 'simulation_all_presets.csv'); end
     L = servolab.motor.presets();
     L = L(arrayfun(@(x) isempty(x.series), L));
+    for k = find(arrayfun(@(x) strcmp(x.spec.plant, 'rigId'), L))   % a rig experiment also on the drive physics
+        x = L(k); x.spec.plant = 'rigPhys'; L(end + 1) = x; %#ok<AGROW>
+    end
     hasSL = ~isempty(ver('simulink')) && license('test', 'Simulink');
-    rows = cell(numel(L), 15);
+    rows = cell(numel(L), 15);  % sized after the rigPhys copies are added
     for k = 1:numel(L)
         sp = L(k).spec; c = servolab.motor.specConfig(sp);
         rise = NaN; over = NaN; ess = NaN; peakU = NaN; dMeas = NaN; dU = NaN; mdl = ''; err = '';

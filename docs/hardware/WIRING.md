@@ -162,26 +162,27 @@ Motor clamped; output shaft free (a tape flag on it to see rotation).
 
 1. `setup` (or `rhino_servo_lab`). Plug in the Uno: the app offers **Flash + connect** or
    **Connect**. The top bar then shows `RIG <port>` and `fw <rev> · drive id 7`, the state READY.
-   If it says "NO DRIVE answered": check 12 V, D8↔pin 3, D9↔pin 2, GND↔pin 1, then **DRIVE CHECK**.
+   If it says "NO DRIVE answered": check the battery, D8↔pin 3, D9↔pin 2, GND↔pin 1, then **DRIVE CHECK**.
 2. **DRIVE CHECK** (reads the RMCS-2303 registers): mode, gains, LPR (must read **13**),
    acceleration, speed, and the measured loop time. It is also written to the session log.
-3. Mission **M1 · Open loop**, preset "Speed steps, open loop" or LAB "speed open loop, 40 rpm",
+3. Mission **M1 · Open loop**, preset "Open-loop speed steps" or LAB "speed open loop, 40 rpm",
    **RUN ON RIG**. The shaft turns; the plot shows the measured speed (cyan) over the grey
    simulation of the same settings; the 3-D disc turns with the measured angle.
-4. **STOP** (or ABORT, Esc, Space): motor power off. Then test the **D4 button** and the battery switch.
-5. Watchdog: during a run, close the app window. The motor must stop within ~1 s.
+4. **STOP**: the motor ramps to rest, then motor power goes off. **ABORT** (or Esc, Space): off at once.
+   Then test the **D4 button** and the battery switch.
+5. Watchdog: during a run, quit MATLAB. The motor must stop within about 2 s.
 6. Direction: with a positive speed command the measured speed must be positive. If the app reports
    `runaway: wrong way`, swap ONE pair (thin motor leads at 14/15, or yellow/white at 10/11),
    then **CLEAR FAULT**.
 7. **Live driving:** mission LAB, **RUN ON RIG**, then type a value under LIVE SETPOINT (or ±10):
    the new rpm (−150 … +150, negative = reverse) goes to the motor at once.
-8. **Course experiments:** each mission's presets are the runs of its course experiment;
+8. **Experiments:** each mission's presets are the runs of its hardware experiments ([catalogue](../EXPERIMENTS.md));
    "▶▶ all runs" plays the whole series. Every run is saved and listed under RUNS.
 
 Tested end to end against the real firmware code and an emulated drive
 (`matlab/tests/e2e/e2e_motor_mission_control.m`, 19/19 on 2026-10-23): connect, DRIVE CHECK,
-live setpoint, automatic save, latched fault and CLEAR FAULT, a course experiment, ABORT.
-On the rig: sessions of 2026-10-11 and 2026-10-23.
+live setpoint, automatic save, latched fault and CLEAR FAULT, a hardware experiment, ABORT.
+On the rig: sessions of 2026-10-11, -23, -24 and -25.
 
 **If something is wrong**
 
@@ -193,7 +194,7 @@ On the rig: sessions of 2026-10-11 and 2026-10-23.
 | HELLO says slave id 0 | drive unpowered, TX/RX swapped, GND missing |
 | `MODBUS_TIMEOUT` flag during a run | loose D8/D9 wire, drive reset by supply dip |
 | speed reads ~25× wrong | LPR not 13 (Drive check shows it) |
-| motor runs the wrong way | expected sign issue C-M3: note it; swap motor leads only if the course needs a fixed direction |
+| motor runs the wrong way | encoder or motor leads reversed (C-M3): the runaway guard stops it; swap one pair (step 6) |
 
 ## 6. Hazards
 

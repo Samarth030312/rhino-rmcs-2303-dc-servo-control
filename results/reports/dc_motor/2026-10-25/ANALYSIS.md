@@ -22,7 +22,7 @@ Counted from every session log (`results/evidence/logs/hw_session_*.log`), which
 | `a04ae3c` | 1 | 18 | 1 | **0** | 0 | 45.1 | 18.0 |
 | `886b32c` | 1 | 27 | 3 | **0** | 0 | -36.9 | 27.0 |
 
-Before the fix: **12 of 20** at-risk starts ran away. After it: **0 of 21**. Every runaway ran the motor backwards at full voltage within 0.1 s (the drive's 53 rpm/s ramp was bypassed), and the guard cut motor power within 0.2 s every time. The cause inside the drive is UNVERIFIED; the fix rests on this record.
+Before the fix: **12 of 12** at-risk starts ran away. After it: **0 of 29**. Every runaway ran the motor backwards at full voltage within 0.1 s (the drive's 53 rpm/s ramp was bypassed), and the guard cut motor power within 0.2 s every time. The cause inside the drive is UNVERIFIED; the fix rests on this record.
 
 What remains at enable: the first sample reads tens of rpm backwards, mostly because the HOME resets the count the speed is computed from; the encoder shows a real jerk (largest count excursion in the first 0.5 s, last column; 1 count = 0.069 deg). It never came near the guard's limits.
 

@@ -9,7 +9,7 @@ N = 100 gear ratio. e = r − y (setpoint minus measurement).
 
 ---
 
-## 1. Armature-controlled DC motor (bare motor, course week 4)
+## 1. Armature-controlled DC motor (bare motor, mission M10)
 
 $$L\frac{di}{dt} = V - R\,i - K_e\,\omega_m \qquad J\frac{d\omega_m}{dt} = K_t\,i - b\,\omega_m - \frac{T_{L,out}}{N\,\eta}$$
 
@@ -89,7 +89,7 @@ Sampled with an effective one-step lag, `y_{k+1} ≈ K_p (r − y_k)`: pole at �
 **oscillates as K_p → 1 and is unstable beyond**. P alone therefore cannot get below ~50 %
 error. Simulation: K_p = 0.2/0.5/0.8 gives 83.3/66.7/55.6 % (theory exactly), K_p = 1.2 oscillates.
 Test: `testRigSpeedPSteadyStateError`, `testRigSpeedPOscillatesAboveUnity`.
-Figure: `results/figures/dc_motor/rig_speed_P_steady_state_error.png`.
+Rig and model: mission M3 in [experiments](../EXPERIMENTS.md#m3--speed-p) and [results](../RESULTS.md).
 
 I only, `u_k = u_{k−1} + K_i T_s e_k`: zero steady-state error; discrete pole condition
 K_i T_s < 1 for stability (with a pure one-step lag), well damped near K_i T_s ≈ 0.25.

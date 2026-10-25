@@ -50,3 +50,12 @@ function [dm, du, S, R] = compare(c)
     dm = max(abs(R.meas(1:n) - S.meas(1:n))) / max(max(abs(S.meas(1:n))), eps);
     du = max(abs(R.u(1:n) - S.u(1:n))) / max(max(abs(S.u(1:n))), eps);
 end
+
+function testModelsOpenInTheOldestSupportedRelease(tc)
+    % a model saved by a newer release does not open in an older one: keep them in R2023b format
+    d = fullfile(fileparts(fileparts(mfilename('fullpath'))), 'models', 'dc_motor');
+    for m = {'servo_identified', 'servo_drive_physics', 'servo_armature'}
+        info = Simulink.MDLInfo(fullfile(d, [m{1} '.slx']));
+        tc.verifyEqual(info.ReleaseName, 'R2023b', [m{1} '.slx was saved in ' info.ReleaseName]);
+    end
+end

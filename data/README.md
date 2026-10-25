@@ -2,8 +2,8 @@
 
 Everything in here was measured on the real rig: an RMCS-2303 drive, an RMCS-5032 motor, an
 Arduino Uno and a Pro-Range 11.1 V 3S2P battery. Nothing in `raw/` is simulated, and nothing
-in it is ever edited (the app writes each file once and marks it read-only). Simulations go to
-`results/evidence/simulation_runs/`, emulator runs to a temporary folder.
+in it is ever edited (the app writes each file once and marks it read-only). Simulations are not stored
+here (they are recomputed from the code); emulator runs go to a temporary folder.
 
 **193 runs** from 2026-10-11, -23, -24 and -25: 184 finished, 9 stopped by the firmware (most
 of them the reverse runaway at start, before the fix; on 2026-10-25 a watchdog stop and a false

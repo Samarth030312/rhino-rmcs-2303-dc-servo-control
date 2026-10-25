@@ -1,8 +1,28 @@
 # Changelog
 
+## 1.1.0 (2026-10-25): every experiment in Simulink; one experiment catalogue
+
+- **Three Simulink models, one per plant.** New `servo_drive_physics` (the rig from datasheet
+  physics: current, 3 A limit, battery headroom, load, inertia). Each model now computes what
+  its MATLAB simulator computes, to rounding, on all 71 cases (`test_simulink_crosscheck`); four
+  real differences were removed on the way: the angle integrator, interpolating delays,
+  Simulink's PID block in place of the firmware's anti-windup, and the sample instant at which
+  outputs were read. The models are grouped into named subsystems (Arduino, sensors, drive,
+  motor) and the signals between them are named.
+- **One experiment catalogue.** Experiments have stable keys and descriptive names; one preset
+  list (`servolab.motor.presets`) serves the app, the scripts and the tests; the old parallel
+  preset list and its stale simulation evidence are gone. `docs/EXPERIMENTS.md` is generated
+  from it and tested against it.
+- **No course text in the app, the code or the reports.** The ENR312 handout mapping is one
+  page, [docs/course](docs/course/README.md).
+- `servolab.motor.simulatePlant` and `runSimulink` run any config on its plant in MATLAB or
+  Simulink; OPEN IN SIMULINK works for every plant.
+- The runaway analysis counted firmware newer than its list as "before the fix" (12 of 20); it
+  now lists the pre-fix revisions instead: 12 of 12 before, 0 of 29 after.
+
 ## 1.0.1 (2026-10-25): verified on the rig
 
-Release acceptance on the lab rig with the final firmware `886b32c`: every course experiment of
+Release acceptance on the lab rig with the final firmware `886b32c`: every experiment of
 M1-M9, 27 of 27 runs finished, no fault ([report](results/reports/dc_motor/2026-10-25/REPORT.md),
 [analysis](results/reports/dc_motor/2026-10-25/ANALYSIS.md)). Found on the rig that day and fixed:
 

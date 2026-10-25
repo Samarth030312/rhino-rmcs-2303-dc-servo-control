@@ -7,7 +7,7 @@ quote). Record how it was closed.
 
 | ID | Conflict | Effect | Resolution path | Status |
 |---|---|---|---|---|
-| C-M1 | Course (SRC-001 week 5) lists a generic DC motor, 6/9 V battery, diode and MOSFET. The lab hardware is an RMCS-2303 servo drive + RMCS-5032 12 V motor. | Firmware and control architecture differ from the course text. | Follow the actual hardware; reproduce the course's generic set-up in simulation ("Bare DC motor" plant). ED-M1. | DECIDED (pending approval) |
+| C-M1 | The lab handout (SRC-001 week 5) lists a generic DC motor, 6/9 V battery, diode and MOSFET. The lab hardware is an RMCS-2303 servo drive + RMCS-5032 12 V motor. | Firmware and control architecture differ from the course text. | Follow the actual hardware; reproduce the course's generic set-up in simulation ("Bare DC motor" plant). ED-M1. | DECIDED (pending approval) |
 | C-M2 | RMCS-5032 title "200RPM" vs table "180RPM". | Max output speed. | Table value 180 is consistent with 18000/100. Confirm in MOTOR-02. | OPEN |
 | C-M3 | Encoder A/B colours: drive manual p.5 (generic motor) red=ENC_B; RMCS-5032 sheet red=EncA. | Wiring per the drive manual crossed A/B: runaway on 2026-10-11 (incident report). | **Resolved: follow the RMCS-5032 sheet — red→pin 11, orange→pin 10.** Confirm on the rig after re-wiring. | RESOLVED (doc); re-wire + confirm PENDING |
 | C-M4 | Drive pin 11 labelled "Hall V" (p.4) vs "Hall U" (p.5); p.5 tables placed side by side look like a pin mapping but are not. | Wiring error risk. | Wire by function and board silkscreen; photograph. | OPEN |

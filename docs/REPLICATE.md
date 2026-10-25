@@ -42,7 +42,7 @@ flowchart LR
 6. **Every mission.** M1 to M9, in order ([the sequence](SEQUENCE.md)). Each rig run is saved,
    registered and drawn over the simulation of its own settings.
 
-Before any run with the battery: [experiment checklist](safety/EXPERIMENT_CHECKLIST.md).
+Before any run with the battery: the [session checklist](safety/EXPERIMENT_CHECKLIST.md).
 
 ## What should match, and what probably will not
 

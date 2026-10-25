@@ -77,5 +77,5 @@ function mdl = build_motor_identified_simulink(outDir)
     note.Position = simulink_note_position(mdl, 900);
 
     if ~exist(outDir, 'dir'), mkdir(outDir); end
-    save_system(mdl, fullfile(outDir, [mdl '.slx']));
+    simulink_save(mdl, fullfile(outDir, [mdl '.slx']));
 end

@@ -13,5 +13,5 @@ MATLAB and Simulink (MathWorks) are required to run the apps and models and are 
 of this repository; the [CI](.github/workflows/ci.yml) uses MathWorks' free licensing for
 public projects on GitHub-hosted runners.
 
-Not included and not redistributed: the ENR312 course handouts and the Rhino Motion Controls RMCS-2303 and RMCS-5032 manuals and datasheets, and the Rhino configuration software. They are cited in
+Not included and not redistributed: the lab handouts and the Rhino Motion Controls RMCS-2303 and RMCS-5032 manuals and datasheets, and the Rhino configuration software. They are cited in
 [`docs/knowledge-base/SOURCE_REGISTER.csv`](docs/knowledge-base/SOURCE_REGISTER.csv).

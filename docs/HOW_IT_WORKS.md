@@ -35,9 +35,10 @@ Measured details: [results](RESULTS.md). The decision record: ED-M1 in
 ```mermaid
 flowchart TB
     A["rhino_servo_lab app<br/>one mission, one set of settings"]
-    A --> S1["PHYSICS plant<br/>bare motor from the datasheet<br/>(M10, armature voltage)"]
     A --> S2["IDENTIFIED plant<br/>the rig as measured:<br/>ramp, gain, latency, quantisation"]
-    A --> SL["OPEN IN SIMULINK<br/>servo_armature.slx or servo_identified.slx,<br/>built with the same numbers"]
+    A --> S3["DRIVE PHYSICS plant<br/>the rig from the datasheet:<br/>current, 3 A limit, load, inertia"]
+    A --> S1["ARMATURE plant<br/>the bare motor, voltage-driven<br/>(M10)"]
+    A --> SL["OPEN IN SIMULINK<br/>the model of the chosen plant,<br/>with the same numbers"]
     A --> HW["RUN ON RIG<br/>the Uno, the drive, the motor"]
     A --> EM["emulator<br/>the firmware compiled for the PC,<br/>an emulated RMCS-2303 (tests, CI)"]
     S2 --- T["one table: SIM | RIG | REF<br/>same metric definitions"]
@@ -46,13 +47,14 @@ flowchart TB
 
 | | What it is | Use it to |
 |---|---|---|
-| **Simulator** | MATLAB, inside the app. The controller is `servolab.motor.pidStep`, line for line the firmware's `pidStep` (clamping anti-windup included). The plant is either the physics of the bare motor (from the datasheet values in the physics panel) or the model identified from the rig's own runs. | learn the concepts without hardware; predict a rig run before making it |
-| **Simulink** | Two generated models in `matlab/models/dc_motor`: the armature (voltage → current → torque → speed) and the identified rig (sampled PID, Modbus latency, drive ramp, quantised sensors). **OPEN IN SIMULINK** builds the model with the app's current settings and opens it. | see the block diagram; change blocks; answer Simulink assignments ([Simulink](SIMULINK.md)) |
+| **Simulator** | MATLAB, inside the app (`servolab.motor.simulatePlant`). The controller is `servolab.motor.pidStep`, line for line the firmware's `pidStep` (clamping anti-windup included). The plant is one of three: the rig as identified from its own runs, the rig built from the datasheet (current, load, inertia, battery), or the bare motor driven by a voltage. | learn the concepts without hardware; predict a rig run before making it |
+| **Simulink** | Three generated models in `matlab/models/dc_motor`, one per plant: `servo_identified`, `servo_drive_physics`, `servo_armature`. **OPEN IN SIMULINK** opens the chosen plant's model with the app's current settings. | see and change the block diagram ([Simulink](SIMULINK.md): the three models, and why three) |
 | **Emulator** | The real sketch (`firmware/motor_controller`) compiled with g++ against an emulated RMCS-2303 that speaks Modbus. It runs in real time on a pseudo-terminal, so the app connects to it as if it were a board. | test the firmware and the app together without a rig (CI does this on every change) |
 | **Rig** | The Uno, the drive, the motor and the battery. | measure |
 
-The simulator and Simulink agree exactly at the controller samples
-(`matlab/tests/test_motor_identified.m`, and [the analysis](../results/reports/dc_motor/2026-10-24/ANALYSIS.md), section 6).
+The simulator and Simulink compute the same thing: on every preset, at every controller
+sample, they agree to rounding (`matlab/tests/test_simulink_crosscheck.m`,
+[Simulink](SIMULINK.md#verification)).
 The emulator runs the firmware's own C code. So a difference between the grey and the
 coloured line in the app is a difference between the **model** and the **rig**, never between
 two implementations.

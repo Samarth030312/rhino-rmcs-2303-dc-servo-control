@@ -1,8 +1,8 @@
 # Results
 
 Everything below comes from `data/raw/dc_motor` through two scripts, rerun on every change:
-`matlab/scripts/motor_session_report.m` (one session: every course question, rig against
-model) and `matlab/scripts/motor_rig_analysis.m` (all sessions: accuracy, repeatability,
+`matlab/scripts/motor_session_report.m` (one session: each characterisation and design
+experiment, rig against model) and `matlab/scripts/motor_rig_analysis.m` (all sessions: accuracy, repeatability,
 refit, Simulink). Full reports: [2026-10-23](../results/reports/dc_motor/2026-10-23/REPORT.md) ·
 [2026-10-24](../results/reports/dc_motor/2026-10-24/REPORT.md) ·
 [analysis of both](../results/reports/dc_motor/2026-10-24/ANALYSIS.md) ·
@@ -16,9 +16,9 @@ on 2026-10-11 data only, so every comparison below is a **prediction**.
 
 | | Rig | Model or theory | |
 |---|---|---|---|
-| static map, slope | 0.997 (forward), 0.998 (reverse) | 1 | [figure](../results/reports/dc_motor/2026-10-24/S3-3_static_map.png) |
+| static map, slope | 0.997 (forward), 0.998 (reverse) | 1 | [figure](../results/reports/dc_motor/2026-10-24/static_map.png) |
 | dead zone | none down to 2 rpm | — | |
-| open-loop step 0 → 60 rpm, rise 10–90 % | 0.94 ± 0.06 s (14 runs) | 0.80 s | [figure](../results/reports/dc_motor/2026-10-24/S3-4_open_loop.png) |
+| open-loop step 0 → 60 rpm, rise 10–90 % | 0.94 ± 0.06 s (14 runs) | 0.80 s | [figure](../results/reports/dc_motor/2026-10-24/open_loop_step.png) |
 | step shape | a 48–54 rpm/s ramp | ramp 53.4 rpm/s | |
 | refit 13 days later | gain 1.002, ramp 53.9 rpm/s, fit error 1.99 rpm | gain 1.000, ramp 53.4 | |
 | full-voltage speed (runaways) | median 166.8 rpm (14 runs) | 166.5 rpm (datasheet, 11.1 V) | |
@@ -28,7 +28,7 @@ on 2026-10-11 data only, so every comparison below is a **prediction**.
 
 ## Closed loop
 
-| Course question | Rig | Model | Textbook |
+| Experiment ([catalogue](EXPERIMENTS.md)) | Rig | Model | Textbook |
 |---|---|---|---|
 | speed P, e_ss at 60 rpm, Kp 0.2 / 0.5 / 0.8 | 49.98 / 40.29 / 33.40 rpm | r/(1+Kp): 50 / 40 / 33.3 | same |
 | speed I, overshoot at Ki 0.5 / 1 / 2 / 4 | 1.5 / 2.7 / 3.5 / 64 % | 0 / 0 / 0 / 55 % | 0.9 / 10 / 24 / 38 % (τ = 0.72 s) |
@@ -37,12 +37,12 @@ on 2026-10-11 data only, so every comparison below is a **prediction**.
 | position P, 10° moves, final error Kp 0.1 / 0.3 / 1.0 | 0.18 / 0.06 / 0.40° | 0.09 / 0.01 / 0.04° | 0 (type 1) |
 | position P Kp 1.0, overshoot | 73 ± 10 % (5 runs) | edge of stability: PM 26° | |
 
-![PI design](../results/reports/dc_motor/2026-10-24/S3-10_PI.png)
+![PI design](../results/reports/dc_motor/2026-10-24/speed_pi_design.png)
 
 ## How good the model is
 
-Over 83 finished runs (2026-10-23 and 24): median error **5.5 % of the run's largest
-setpoint**. Part of every speed error is quantisation (the drive register reads in 4.6 rpm
+Over 83 finished runs of 2026-10-23 and 24, median error **5.5 % of the run's largest
+setpoint**; over 79 of 2026-10-25, **6.3 %**. Part of every speed error is quantisation (the drive register reads in 4.6 rpm
 steps). Overshoot and rise time, rig against model:
 
 ![model accuracy](../results/reports/dc_motor/2026-10-24/a_model_accuracy.png)
@@ -51,15 +51,32 @@ steps). Overshoot and rise time, rig against model:
 
 A speed run started from rest without re-homing the drive ran the motor backwards at full
 voltage: **12 of 12** such starts over three days, every one stopped by the firmware's runaway
-guard within 0.2 s. With a HOME at every RUN (firmware e60d046 and later): **0 of 21**. The
+guard within 0.2 s. With a HOME at every RUN (firmware e60d046 and later): **0 of 29**. The
 cause inside the drive is not known; the fix rests on the record, every start of every session
 log ([analysis §1](../results/reports/dc_motor/2026-10-24/ANALYSIS.md)).
 
 ![start transients](../results/reports/dc_motor/2026-10-24/a_start_transients.png)
 
+Verified on the rig on 2026-10-25 ([report](../results/reports/dc_motor/2026-10-25/REPORT.md),
+[changelog](../CHANGELOG.md)):
+
+- **Soft stop.** A run that ends with the motor turning brings it to rest on the drive's ramp
+  before motor power goes off: 79 soft stops in 81 runs (the other two were stopped by the
+  firmware), none cut early; from 60 rpm, 1.2 s (the 53 rpm/s ramp predicts 1.1 s).
+- **Host watchdog.** One run was stopped because the app blocked for 1.1 s after RUN; after the
+  fix (set-up before RUN, a 2 s watchdog) the longest stall in 27 runs was 0.60 s.
+- **Runaway guard.** One false stop at a commanded −150 → 0 rpm; the guard now allows for the
+  drive's ramp. Real runaways still stop within 0.2 s (tested against the emulated drive).
+- **Bridge.** Registers read through it with raw Modbus equal those DRIVE CHECK reads.
+
+## Simulation
+
+All 39 presets, and every rig experiment also on the drive physics (71 cases), run in the
+MATLAB simulator and in Simulink without an error, and agree to 1e-10 or better
+([Simulink](SIMULINK.md#verification), [table](../results/tables/simulation_all_presets.csv)).
+
 ## Open
 
-- The soft stop (no jolt when an experiment ends turning) and the bridge to the Rhino software
-  are tested on the PC and against the emulated drive, not yet on the rig.
+- The Rhino configuration software itself, through the bridge (needs a Windows PC with the rig).
 - The drive's current limit: 3 A (manual) or 5 A (product page), conflict C-M7.
 - [All open items](knowledge-base/OPEN_ITEMS.md).

@@ -110,7 +110,7 @@ function mdl = build_dc_motor_simulink(outDir)
     note.Position = simulink_note_position(mdl, 700);
 
     if ~exist(outDir, 'dir'), mkdir(outDir); end
-    save_system(mdl, fullfile(outDir, [mdl '.slx']));
+    simulink_save(mdl, fullfile(outDir, [mdl '.slx']));
 end
 
 function setWorkspace(mdl, c)

@@ -3,8 +3,8 @@
 A practical guide to `rhino_servo_lab`, the one window in which you simulate, run and replay
 every experiment of this rig. If you know what a transfer function is, or are about to learn,
 this is enough to work through outer-loop speed and position control from open loop to PI.
-The missions follow the ENR312 MOTOR handout of Ahmedabad University ([course guide](../course/README.md)),
-which makes them a complete sequence for anyone.
+Every experiment, with its settings and what the model predicts, is listed in
+[experiments](../EXPERIMENTS.md); the measured answers are in [results](../RESULTS.md).
 
 **Contents**
 
@@ -25,7 +25,7 @@ which makes them a complete sequence for anyone.
 
 The rig is a 12 V gear motor (RMCS-5032, 100:1, a 13-line encoder on the motor shaft) behind
 a servo drive (RMCS-2303) that **closes its own speed loop**. An Arduino Uno talks to the drive
-over Modbus at 9600 baud and closes the *outer* loop the course asks for: open loop, P, I or PI,
+over Modbus at 9600 baud and closes the *outer* loop: open loop, P, I or PI,
 on speed or on angle, ten times a second.
 
 The app answers one question: *what will this controller do on this rig?* It answers it
@@ -42,8 +42,8 @@ honestly:
 - **What it cannot know** is a change in your rig: another battery voltage, a load on the
   shaft, a drive with other settings. Section 8 shows how to re-identify it from one run.
 
-Next to every simulated number is the same number from the rig (RIG), and the course's own
-first-order model (REF), so the three can be compared line by line.
+Next to every simulated number is the same number from the rig (RIG) and from first-order
+theory (REF: K 1, τ 0.72 s, no delay), so the three can be compared line by line.
 
 ## 2. Start in two minutes
 
@@ -69,10 +69,10 @@ recorded, the run clock, and **ABORT**. ABORT, Esc and Space cut motor power at 
 
 **Left: what you are simulating.**
 
-- **MISSION:** M1-M9 follow the course experiments, M10 opens the motor itself (physical model); LAB is free use. The line under the buttons says what
-  the mission is about.
-- **Preset:** the runs of the mission's course hardware experiment, so the simulation and the
-  rig run exactly the same thing. "▶▶ all runs" plays the whole series on the rig.
+- **MISSION:** M1-M9 one control question each, M10 the motor itself (physical model), LAB
+  free use. The line under the buttons says what the mission is about.
+- **Preset:** the runs of the mission's hardware experiments, so the simulation and the rig run
+  exactly the same thing. "▶▶ all runs" plays a whole series on the rig.
 - **SPEED / POSITION** and **DRIVE SPEED / ENCODER COUNTS:** which loop, and where the speed
   comes from. The drive's register is coarse (4.6 rpm steps) but fresh; encoder counts over
   100 ms are fine (0.115 rpm) but on average 50 ms old.
@@ -91,7 +91,7 @@ one line saying what happened or what to do next.
 command u that the Arduino sends to the drive, with its limits. M2 adds the static map.
 
 Colours, everywhere: **grey** simulation · **cyan** the live rig · **orange** the live command ·
-**violet** a recorded run · **dotted amber** the course's first-order model · **dashed** the setpoint.
+**violet** a recorded run · **dotted amber** first-order theory · **dashed** the setpoint.
 
 **Bottom.** Left: the rig controls (port, CONNECT, FLASH FIRMWARE, DRIVE CHECK, RUN ON RIG,
 STOP, CLEAR FAULT, PLAY SIMULATION). Centre: the SIM / RIG / REF table and the LIVE SETPOINT
@@ -111,8 +111,8 @@ OVERLAY RUN, NEXT MISSION, PLAY and a scrub bar.
 The **MOTOR · DRIVE · BATTERY** panel takes the datasheet values (rated voltage, no-load speed
 and current, stall current, gear ratio, J, L, drive current limit, battery voltage and capacity)
 and derives R, Kt = Ke, b, the electrical and mechanical time constants, the free speed and
-ω(s)/V(s), shown live under the fields. **OPEN IN SIMULINK** builds the Simulink model with the
-current settings.
+ω(s)/V(s), shown live under the fields. **OPEN IN SIMULINK** opens the Simulink model of the
+chosen plant with the current settings ([Simulink](../SIMULINK.md): three models, and why).
 
 ### Runs and data
 
@@ -131,8 +131,8 @@ Click **M1 · Open loop** and press **PLAY SIMULATION**.
   1.1 s, whatever a first-order "tau" would say.
 - **The command** jumps to 60 at once: in open loop the Arduino just writes the setpoint.
 - **The table:** rise 10-90 % 0.80 s in the model, **0.90 s on the rig**; slope 53.3 rpm/s
-  measured against 53.4 fitted; gain 1.000. The amber course model (K 1, tau 0.72 s) has the
-  same final value but the wrong shape: the rig is a ramp, not a lag (course question S3-4).
+  measured against 53.4 fitted; gain 1.000. The amber first-order model (K 1, τ 0.72 s) has the
+  same final value but the wrong shape: the rig is a ramp, not a lag.
 
 ## 5. Reading the plots and the numbers
 
@@ -157,18 +157,19 @@ alike, on the first step of the profile (the first setpoint change):
 
 ## 6. The missions, one by one
 
-Rig numbers below are from the course session of 2026-10-23
-([report](../../results/reports/dc_motor/2026-10-23/REPORT.md)).
+Rig numbers below are from the session of 2026-10-23
+([report](../../results/reports/dc_motor/2026-10-23/REPORT.md)); every session is in [results](../RESULTS.md).
 
-### M1 · Open loop (S3-2, S3-4)
+### M1 · Open loop
 *How does the actuator respond to a step?* See section 4. Compare DRIVE SPEED and ENCODER
 COUNTS: the register's 4.6 rpm staircase against the counts' fine but delayed reading.
 
-### M2 · Static map (S3-3)
+### M2 · Static map
 *Is there a dead zone, and where does it saturate?* Commands from 1 to 150 rpm, 3 s each, both
 directions. **On the rig: no dead zone** (2 rpm asked, 2.04 measured), slope 0.997 forward and
 0.998 reverse, linear up to 150 rpm. The drive closes its own loop, so the Arduino's
-"actuator" is a near-perfect speed source up to the 161-170 rpm the battery allows.
+"actuator" is a near-perfect speed source up to the motor's free speed on the battery (about
+166 rpm at 11.1 V).
 
 ![M2](img/m2_static_map.png)
 
@@ -177,25 +178,25 @@ directions. **On the rig: no dead zone** (2 rpm asked, 2.04 measured), slope 0.9
 the error is r/(1 + Kp): 83 %, 67 %, 56 % of the step for Kp 0.2, 0.5, 0.8. Raise Kp towards 1
 and the 100 ms sampling with the 70 ms latency makes the loop ring.
 
-### M4 · Speed I (S3-9)
+### M4 · Speed I
 *More Ki, less damping.* The delay-free theory gives ζ = 1/(2√(τ K Ki)) and overshoots of
-1 %, 10 %, 24 %, 38 % for Ki 0.5, 1, 2, 4. **The rig: 0 %, 2.7 %, 1.6 %, 58.7 %.** The model,
+1 %, 10 %, 24 %, 38 % for Ki 0.5, 1, 2, 4. **The rig: 0 %, 3.1 %, 1.8 %, 65.8 %.** The model,
 which knows the ramp and the latency, predicts 0, 0, 0 and 55 %. At low Ki the integrator is
 slower than the drive's ramp, so nothing overshoots; at Ki 4 the latency adds the phase lag the
 formula leaves out.
 
 ![M4](img/m4_speed_i.png)
 
-### M5 · Speed PI (S3-10)
+### M5 · Speed PI
 *Does the textbook design work?* Kp 1.0, Ki 2.9, designed for ζ 0.7 at ωn 2 rad/s on the
 first-order model, predicts 4.6 % overshoot (9.7 % with the PI zero, the amber REF column).
-**The rig overshoots 29.0 %** and then holds a **±6.7 rpm limit cycle**; the identified model
+**The rig overshoots 32.3 %** and then holds a **±6.7 rpm limit cycle**; the identified model
 predicted 25.8 % and shows the same cycle. A design for this rig has to include the delay, or
 use a lower Kp (the hand-tuned Kp 0.3, Ki 1.5 settles).
 
 ![M5](img/m5_speed_pi_rig.png)
 
-### M6 · Windup (S3-12)
+### M6 · Windup
 The command is limited to 50 rpm and 80 rpm is asked for 6 s; then 30 rpm. With the firmware's
 clamping anti-windup, **the rig is back within 5 % of 30 rpm 0.5 s after the drop**, as the
 model predicts. Switch to **PLAIN INTEGRATOR** (simulation only): the integral has grown for 6 s,
@@ -203,16 +204,17 @@ and the speed stays at 50 rpm for the rest of the run.
 
 ![M6](img/m6_windup.png)
 
-### M7 · Position P (S3-5, S3-11)
+### M7 · Position P
 *Does P alone reach a 10° target?* Yes: the drive turns a speed command into motion even at a
 fraction of an rpm, so there is no dead zone to stop short in. **The rig ends within 0.11-0.17°**
-(two encoder counts) for Kp 0.1, 0.3 and 1.0; Kp 1.0 overshoots 56 %.
+(two encoder counts) for Kp 0.1, 0.3 and 1.0; Kp 1.0 overshoots 62 %.
 
 ![M7](img/m7_position_p.png)
 
 ### M8 · Position I and M9 · Position PI
 Two integrators (the drive's speed-to-angle and the controller's) make I alone oscillate around
-the target; PI adds a slow tail and overshoot for little gain over P on this rig.
+the target. PI adds overshoot and a slow tail; without a load on the shaft there is no offset
+for the integrator to remove.
 
 ### M10 · Armature
 *What is inside the drive's loop?* The bare RMCS-5032 driven by a voltage, built from the
@@ -225,8 +227,8 @@ it runs.
 
 ## 7. Driving the rig
 
-1. **Wire and power** per [`DC_MOTOR_WIRING.md`](../hardware/WIRING.md); the
-   [checklist](../safety/EXPERIMENT_CHECKLIST.md) first.
+1. **Wire and power** per [wiring](../hardware/WIRING.md); the
+   [session checklist](../safety/EXPERIMENT_CHECKLIST.md) first.
 2. **Plug in the Uno.** The app notices it within a second and offers **Flash + connect** (first
    time on this board, or after a firmware update) or **Connect**. FLASH FIRMWARE does the same at
    any time; it installs the Arduino toolchain the first time (about 60 MB) and writes a log.
@@ -235,7 +237,8 @@ it runs.
    (grey); the 3-D disc turns with the measured angle; the table fills a RIG LIVE column. When
    the run ends it is saved (raw CSV, read-only, plus metadata and a picture of the window) and
    appears under RUNS.
-5. **Stopping.** STOP, ABORT, Esc and Space cut motor power. The firmware also stops by itself
+5. **Stopping.** STOP brings the motor to rest on the drive's ramp, then switches motor power off;
+   ABORT, Esc and Space switch it off at once. The firmware also stops by itself
    if MATLAB is silent for 2 s, if the motor runs away (wrong way or too fast) or if the drive
    stops answering. The state chip turns red, the status line says why and what to check, and
    **CLEAR FAULT** (highlighted) re-homes the drive before the next run.
@@ -250,8 +253,7 @@ it runs.
   K, the ramp, tau and the dead time are fitted to it (`servolab.motor.fitIdentified`), and every
   mission is simulated with them. **RESET TO MEASURED MODEL** goes back.
 - **Record.** `app.record(folder)` plays the current simulation or replay frame by frame into
-  `simulation.mp4` with a `run_config.json`; `motor_formal_runs(true, true)` records one video
-  per mission.
+  `simulation.mp4` with a `run_config.json`.
 
 ## 9. Working with the data in MATLAB
 

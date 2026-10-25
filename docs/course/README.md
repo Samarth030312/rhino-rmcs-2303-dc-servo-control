@@ -1,52 +1,48 @@
-# Course guide: ENR312 Control Systems Laboratory (Ahmedabad University)
+# ENR312 course guide (Ahmedabad University)
 
-This repository is the DC-motor apparatus of the ENR312 control laboratory. Everything in it
-is general; this page is the map from the course's MOTOR handout to the parts of the
-repository that let you **do** each task and **find** each answer yourself. It does not give
-the answers: the data, the models and the tools do.
+For students of the ENR312 Control Systems Laboratory, whose DC-motor apparatus this is. The
+rest of the repository is general; this page only maps the MOTOR handout to the experiment that
+answers each question. Run it, read the numbers, and write the answer in your own words.
 
-## Before the lab
+## Which experiment answers which question
 
-1. Install and open the app ([the sequence](../SEQUENCE.md), steps 1–5); run each mission in
-   simulation once. Write down what you expect the rig to do before you see it.
-2. Read [how it works](../HOW_IT_WORKS.md): the drive closes its own speed loop, and your
-   Arduino controller is an outer loop around it. Most handout questions turn on this.
-
-## The handout, task by task
-
-| Handout | Mission in the app | What to look at |
+| Handout | Mission · experiment in the app | What it gives you |
 |---|---|---|
-| Section 1, task 1: identify the motor | — | [hardware reference](../hardware/HARDWARE_REFERENCE.md) §1, the label on your motor |
-| task 2: the driver | DRIVE CHECK | [hardware reference](../hardware/HARDWARE_REFERENCE.md) §2: modes, registers, scaling |
-| task 3: position and speed with the Arduino | M1, M7 | the firmware (`firmware/motor_controller`), the loop letter `S` / `E` / `P` in the data |
-| task 4: P, I and PI | M3–M9 | each mission's presets; the SIM / RIG / REF table |
-| S3-1 resolution | — | encoder lines, gear ratio: [first principles §3](../FIRST_PRINCIPLES.md#3-the-sampled-outer-loop) |
-| S3-2 speed from counts, window, noise | M1 (DRIVE SPEED / ENCODER COUNTS) | the two feedback paths of the same step |
-| S3-3 static map, dead zone, saturation | M2 | the map plot; push the command towards the battery's free speed |
-| S3-4 K and τ from a step | M1 | the step's shape; is a first-order model adequate? |
-| S3-5 position P final error | M7 | the final error in counts for three gains |
-| S3-6 loop time | DRIVE CHECK after a run | the firmware's own `micros()` measurement |
-| S3-7 Simulink model vs measurements | OPEN IN SIMULINK, identified plant | [Simulink](../SIMULINK.md); overlay a rig run on the model |
-| S3-8 more inertia | M10 (inertia factor), and the rig | why the rig and the bare motor answer differently |
-| S3-9 I only, damping against Ki | M4 | four gains; compare the textbook ζ with SIM and RIG |
-| S3-10 PI designed for ζ 0.7 | M5 | design it on paper first; then SIM, then RIG |
-| S3-11 why P stops short | M7 | the final error; what would make it stop short? |
-| S3-12 windup | M6 | ANTI-WINDUP on / PLAIN INTEGRATOR in simulation; the rig clamps |
-| Assignment 3 (Simulink) | M10 and the identified plant | [Simulink](../SIMULINK.md) |
+| §1 task 1, the motor | (none) | [hardware reference](../hardware/HARDWARE_REFERENCE.md) §1 and your motor's label |
+| §1 task 2, the driver | DRIVE CHECK | the drive's registers; [hardware reference](../hardware/HARDWARE_REFERENCE.md) §2 |
+| §1 task 3, speed and position from the Arduino | M1, M7 | the firmware in `firmware/motor_controller` |
+| §1 task 4, P, I and PI | M3, M4, M5 (speed) · M7, M8, M9 (position) | each controller, simulated and on the rig |
+| S3-1 resolution | (none) | [first principles §3](../FIRST_PRINCIPLES.md#3-the-sampled-outer-loop): encoder lines, gear ratio, Ts |
+| S3-2 speed from counts | M1 · Open-loop step 0 → 60 rpm, runs 1 and 2 | the same step read from the drive register and from the encoder |
+| S3-3 static map | M2 · Static map | dead zone, slope and saturation, both directions |
+| S3-4 K and τ | M1 · Open-loop step 0 → 60 rpm | the step's shape; whether a first-order model fits it |
+| S3-5 position P final error | M7 · Position P final error on 10 deg moves | the final error for three gains, in encoder counts |
+| S3-6 loop time | DRIVE CHECK after a run | the firmware's own timing of its loop |
+| S3-7 Simulink model against measurements | OPEN IN SIMULINK, plant *identified*; RUNS → OVERLAY RUN | [Simulink](../SIMULINK.md) |
+| S3-8 more inertia | M10 (inertia factor); the *drive physics* plant | why the bare motor and the rig answer differently |
+| S3-9 I only, damping | M4 · Speed I only, Ki sweep | four gains: theory (REF), model (SIM), rig |
+| S3-10 PI for ζ 0.7 | M5 · Speed PI designed for zeta 0.7 | design on paper first; then SIM; then the rig |
+| S3-11 why P stops short | M7 · Position P final error on 10 deg moves | what the drive does near zero speed |
+| S3-12 windup | M6 · Saturation and windup | ANTI-WINDUP on and off in simulation; the rig clamps |
+| Assignment 3 (Simulink) | M10, and any mission on the *identified* plant | [Simulink](../SIMULINK.md): the three models and why |
 
-## Running the rig in a session
+## Your data
 
-Wiring and safety first ([checklist](../safety/EXPERIMENT_CHECKLIST.md)). Then
-[the sequence](../SEQUENCE.md) steps 7–10: every run is saved and numbered in
-`data/RUN_REGISTER.csv`, so your report can cite run ids. `motor_session_report('<date>')`
-turns a session into figures and tables; use them, and explain them in your own words.
+Every rig run is saved by itself, finished or stopped:
+`data/raw/dc_motor/MOTOR-Rnnnn_<date-time>_<mission>.csv` (read-only), its settings in
+`data/metadata/`, and one line in `data/RUN_REGISTER.csv`. Cite the run id (`R0123`) for every
+hardware number in your report. RUNS in the app lists the runs; OVERLAY RUN draws any of them
+over the simulation of its own settings. After the session,
+`motor_session_report('YYYY-MM-DD', 'HH:MM')` turns your runs into figures and tables
+([data](../../data/README.md)).
 
-## The lab report
+## How to learn from it
 
-The course asks for a summary of the tasks, a description of what you did, your programs, the
-answers to the Section 2 and Section 3 questions, screenshots of simulation inputs and
-outputs, and a comparison of simulation and hardware with its advantages and limitations.
-Cite run ids for every hardware number. Your measurements may differ from the lab's earlier
-ones (another battery charge, another day); say how and why.
+1. Before each run, write down what you expect: the textbook's number (REF) and the model's
+   (SIM). Then run the rig.
+2. Where they differ, find out why: the drive's ramp, the Modbus delay, the 100 ms sampling,
+   the quantised feedback. [First principles](../FIRST_PRINCIPLES.md) covers each one.
+3. Change one thing at a time, in simulation first.
 
-Live-session steps for the teaching assistant: [checklist](LIVE_SESSION_CHECKLIST.md).
+Before the rig: the [session checklist](../safety/EXPERIMENT_CHECKLIST.md). Your numbers may
+differ from the earlier [results](../RESULTS.md) (battery charge, another day); say how and why.

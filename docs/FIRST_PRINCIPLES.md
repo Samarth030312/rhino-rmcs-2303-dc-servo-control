@@ -52,7 +52,7 @@ the motor is no longer V → ω: it is **command → speed**. On the rig (open-l
 - nothing slower than the 100 ms sampling can see: the fitted lag τ and dead time θ are zero.
 
 So the identified plant is **K = 1, a rate limit, and the measurement and command timing**.
-A first-order K/(τs + 1) fitted to the same step (τ ≈ 0.72 s, the course's model) has the
+A first-order K/(τs + 1) fitted to the same step (τ ≈ 0.72 s, the textbook model of this rig) has the
 same final value but the wrong shape: an exponential where the rig is a straight line.
 
 ## 3. The sampled outer loop
@@ -81,7 +81,7 @@ With the drive as a unit-gain speed source, the outer plant is G ≈ 1 (plus ram
 - **P:** u = Kp e, y = u at steady state, so e_ss = r / (1 + Kp). At r = 60 rpm:
   Kp 0.2 → 50 rpm, 0.5 → 40 rpm, 0.8 → 33.3 rpm. The rig: 49.98, 40.29, 33.40 rpm.
 - **I:** y/r = Ki / (s + Ki) for a pure unit gain: first order, no overshoot, any Ki. With the
-  course's first-order plant (τ = 0.72 s): ζ = 1 / (2√(τ K Ki)), so ζ falls as Ki rises
+  first-order plant (τ = 0.72 s): ζ = 1 / (2√(τ K Ki)), so ζ falls as Ki rises
   (0.83, 0.59, 0.42, 0.29 for Ki 0.5, 1, 2, 4). The rig overshoots 1.5, 2.7, 3.5 and 64 %:
   little until the **delay** (not τ) runs out of phase at Ki 4.
 - **PI designed for ζ 0.7, ωn 2 rad/s** on K/(τs + 1): Kp = (2ζωnτ − 1)/K = 1.0,

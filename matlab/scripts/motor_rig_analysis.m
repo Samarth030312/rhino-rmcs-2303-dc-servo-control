@@ -333,8 +333,8 @@ function Z = logStarts(logDir)
             end
             speedRun = any(strcmp(r.loop, {'S', 'E'}));
             fwName = regexprep(r.fw, '^rhino_servo_lab ', '');
-            % firmware that writes HOME at every RUN (OI-M12 fix): add later revisions here
-            homeAtRun = any(startsWith(fwName, {'e60d046', 'f87b283'}));
+            % the revisions from before the OI-M12 fix (HOME at every RUN, e60d046); every later one has it
+            homeAtRun = ~any(startsWith(fwName, {'e5dcf90', 'f51740a', 'a667d66', '983e3a3', '937bb34', '?'}));
             % jerk: count excursion in the first 0.5 s, only while 0 is commanded (real motion otherwise)
             n5 = min(5, size(r.tel, 1)); c = r.tel(1:n5, 3); jerk = NaN;
             if strcmp(r.loop, 'E') && all(isfinite(c)) && all(r.tel(1:n5, 2) == 0), jerk = max(c) - min(c); end

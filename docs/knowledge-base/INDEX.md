@@ -8,7 +8,7 @@ implement, simulate, test, and reproduce the experiments of this repository.
 ## Authority order
 
 1. Manufacturer documentation for the actual hardware.
-2. The experiment guidelines (for the ENR312 course: the handouts, see `../course/`).
+2. The experiment guidelines (the lab handouts, `SOURCE_REGISTER.csv`).
 3. Verified measurements from the physical apparatus.
 4. Official software and library documentation.
 5. Academic control-system references.
