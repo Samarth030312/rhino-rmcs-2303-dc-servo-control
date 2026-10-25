@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.1 (2026-10-25): verified on the rig
+
+Release acceptance on the lab rig with the final firmware `886b32c`: every course experiment of
+M1-M9, 27 of 27 runs finished, no fault ([report](results/reports/dc_motor/2026-10-25/REPORT.md),
+[analysis](results/reports/dc_motor/2026-10-25/ANALYSIS.md)). Found on the rig that day and fixed:
+
+- **Soft stop** powered the motor off at up to ~7 rpm: the drive's speed register reads 0 below
+  4.6 rpm. Rest now also needs the encoder still. 79 soft stops that day, none early.
+- **Host watchdog** stopped one run: the app blocked for 1.1 s after RUN. The app now prepares
+  and redraws before RUN; the watchdog is 2 s (stalls measured up to 0.93 s with Simulink open).
+- **Runaway guard** stopped a correct run at a commanded -150 -> 0 rpm; it now allows for the
+  drive's ramp.
+- **BRIDGE** after a reset comes back silent at 9600 at once: verified on the drive, the first
+  answer 1.0 s after the port opens. Registers read through the bridge equal DRIVE CHECK's.
+- **Simulink build** no longer breaks when the workspace holds a variable named like a model
+  parameter (`R`, `J`, ...).
+- Upload and IDE helpers name this repository's sketch only.
+
 ## 1.0.0 (2026-10-25): first public release
 
 The DC-servo apparatus of an Arduino control lab, released on its own. It brings:

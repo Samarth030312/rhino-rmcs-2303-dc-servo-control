@@ -68,7 +68,27 @@ On a Windows PC with the rig:
 4. Optional: write a different acceleration in the Rhino program, END BRIDGE, DRIVE CHECK: the
    new value is there. Restore 5000 (or the firmware's runs will no longer match the model).
 
-Status: the bridge is tested end to end against the emulated drive (a Modbus read of the LPR
-register through the Uno, `firmware/tests/firmware_host_test.cpp` and the MATLAB end-to-end
-test). **The comparison with the Rhino program itself has not been run yet**: it needs a
-Windows PC at the rig. Record the two register lists in the session's report when it is.
+Status:
+
+- **Tested against the emulated drive**: a Modbus read through the Uno, a reset while bridged,
+  `$ENDBRIDGE` (`firmware/tests/firmware_host_test.cpp`, and the MATLAB end-to-end test).
+- **Tested on the lab's drive, 2026-10-25** (firmware `348dc56` and later, Linux): a script
+  played the Rhino program's part, sending raw Modbus ASCII frames through the bridged Uno.
+  The registers read that way equal the ones DRIVE CHECK reads through the firmware:
+
+  | register | through the bridge (PC, raw Modbus) | DRIVE CHECK (firmware) |
+  |---|---:|---:|
+  | 0 id/save | 1792 (0x700) | 1792 (0x700) |
+  | 2 mode | 512 (0x200) | 512 (0x200) |
+  | 10 LPR | 13 | 13 |
+  | 14 speed command | 0 | 0 |
+  | 24 speed feedback | 0 | 0 |
+
+  Every reply's LRC checked. Opening the port resets the Uno, which comes back bridged, silent
+  and at 9600: the drive answered **1.0 s** after the port opened (the bootloader), with no
+  stray bytes. Before this was fixed (`348dc56`) the Uno first printed its start-up text at
+  115200 and listened only after 2.8 s, so a program that queries at once got noise and no
+  answer. `$ENDBRIDGE` brought the controller back (`$HELLO`) every time.
+- **Not yet run: the Rhino program itself.** It needs a Windows PC at the rig. Record the two
+  register lists in the session's report when it is. If the program reports no drive right
+  after opening the port, wait a second and connect again (the Uno's reset).

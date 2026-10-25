@@ -160,8 +160,12 @@ function N = motor_session_report(day, fromTime)
     % ---------------------------------------------------------------- safety events
     say('## Safety events');
     st = I(startsWith(I.result, 'STOPPED'), :);
-    say('The firmware cut motor power %d time(s) in the recorded runs:', height(st)); say('');
-    say('| run | experiment | at t (s) | command (rpm) | measured (rpm) | reason |'); say('|---|---|---:|---:|---:|---|');
+    if height(st) == 0
+        say('None: the firmware did not cut motor power in any of the %d recorded runs.', height(I)); say('');
+    else
+        say('The firmware cut motor power %d time(s) in the recorded runs:', height(st)); say('');
+        say('| run | experiment | at t (s) | command (rpm) | measured (rpm) | reason |'); say('|---|---|---:|---:|---:|---|');
+    end
     for k = 1:height(st)
         T = load_(st.id{k});
         say('| %s | %s run %d | %.1f | %.1f | %.1f | %s |', st.id{k}, shortName(st.name{k}), max(st.run(k), 1), T.t_s(end), T.u(end), T.meas(end), erase(st.result{k}, 'STOPPED: '));

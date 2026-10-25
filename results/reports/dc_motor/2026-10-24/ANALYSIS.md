@@ -25,7 +25,7 @@ What remains at enable: the first sample reads tens of rpm backwards, mostly bec
 ![start transients](a_start_transients.png)
 
 ## 2. The datasheet physics against the runaways
-Each runaway is, by accident, a full-voltage test: the drive applied the whole supply to the motor (the 2026-10-11 ones came from the reversed encoder wiring, positive feedback, the later ones from OI-M12). Largest speed read in the first 0.3 s of those 14 runs: median **166.8 rpm**, range 165.9 to 175.3 (the drive register reads in 4.6 rpm steps). The datasheet model (`servolab.motor.physics`: 180 rpm at 12 V, 0.8 A no-load, 7.5 A stall, 11.2 V battery) predicts **168.0 rpm** free speed at the output shaft, +0.7 % from the median. The battery voltage was not logged, so this agreement is within the voltage uncertainty, not a proof.
+Each runaway is, by accident, a full-voltage test: the drive applied the whole supply to the motor (the 2026-10-11 ones came from the reversed encoder wiring, positive feedback, the later ones from OI-M12). Largest speed read in the first 0.3 s of those 14 runs: median **166.8 rpm**, range 165.9 to 175.3 (the drive register reads in 4.6 rpm steps). The datasheet model (`servolab.motor.physics`: 180 rpm at 12 V, 0.8 A no-load, 7.5 A stall, 11.1 V battery) predicts **168.0 rpm** free speed at the output shaft, +0.7 % from the median. The battery voltage was not logged, so this agreement is within the voltage uncertainty, not a proof.
 
 ## 3. How well the model predicts the rig
 RMSE between the rig's measurement and the model's measurement at the same controller instants, over the whole run.

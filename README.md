@@ -46,7 +46,7 @@ step: **[the sequence](docs/SEQUENCE.md)**.
 
 ## What the rig showed
 
-From 112 recorded runs on three days, 2026-10-11, -23 and -24 ([analysis](results/reports/dc_motor/2026-10-24/ANALYSIS.md)):
+From 112 recorded runs on three days, 2026-10-11, -23 and -24 ([analysis](results/reports/dc_motor/2026-10-24/ANALYSIS.md); 81 more on 2026-10-25, [analysis](results/reports/dc_motor/2026-10-25/ANALYSIS.md)):
 
 - **The drive turns the motor into a near-perfect speed source.** Commanded against measured
   speed has a slope of 0.997 with no dead zone down to 2 rpm, in both directions.
@@ -121,11 +121,14 @@ The controller law is the same line by line in the firmware (`pidStep` in C) and
 ## Status
 
 - **On the rig:** every course experiment (open loop, static map, speed P / I / PI, windup,
-  position P / I / PI), 112 runs on three days; the board runs firmware f87b283.
-- **Fixed and verified on the rig:** the reverse runaway at start (HOME at every RUN).
-- **Ready, not yet run on the rig:** the soft stop at the end of a run (no more jolt when an
-  experiment ends turning), and the bridge for the Rhino configuration software (needs a
-  Windows PC with the rig).
+  position P / I / PI), 193 runs on four days. Release acceptance on 2026-10-25 with the final
+  firmware `886b32c`: every experiment of M1-M9, 27 of 27 runs without a fault
+  ([report](results/reports/dc_motor/2026-10-25/REPORT.md)).
+- **Fixed and verified on the rig:** the reverse runaway at start (HOME at every RUN); the soft
+  stop at the end of a run (the motor ramps to rest before power goes off: no jolt); the bridge
+  to the drive (registers read through it equal DRIVE CHECK's).
+- **Not yet run:** the Rhino configuration software itself through the bridge (needs a Windows
+  PC with the rig; [procedure](docs/RHINO_SOFTWARE.md)).
 - **Tested on:** Ubuntu 22.04 with the rig; Windows, macOS and Ubuntu in CI (install,
   firmware compile, every MATLAB test, the app against the emulated drive). A real USB board
   is the one thing CI cannot plug in.

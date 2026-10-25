@@ -22,3 +22,4 @@ evidence/simulation_runs/dc_motor/       one folder per recorded simulation pres
 | 2026-10-11 | [findings](../docs/experiments/HW-SESSION-20261011-1314_FINDINGS.md) | first runs; the encoder wired in reverse ran the motor away; fixed; 20 runs |
 | 2026-10-23 | [report](reports/dc_motor/2026-10-23/REPORT.md) | every course experiment on the rig, 39 runs |
 | 2026-10-24 | [report](reports/dc_motor/2026-10-24/REPORT.md), [analysis](reports/dc_motor/2026-10-24/ANALYSIS.md) | the campaign M1–M9 again, the reverse runaway found and fixed, latency measured, 51 runs |
+| 2026-10-25 | [report](reports/dc_motor/2026-10-25/REPORT.md), [analysis](reports/dc_motor/2026-10-25/ANALYSIS.md) | release acceptance: soft stop, BRIDGE and two guard fixes verified; final firmware 27 of 27 runs without a fault; 81 runs |

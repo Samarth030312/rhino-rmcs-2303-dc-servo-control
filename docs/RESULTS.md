@@ -5,7 +5,10 @@ Everything below comes from `data/raw/dc_motor` through two scripts, rerun on ev
 model) and `matlab/scripts/motor_rig_analysis.m` (all sessions: accuracy, repeatability,
 refit, Simulink). Full reports: [2026-10-23](../results/reports/dc_motor/2026-10-23/REPORT.md) ·
 [2026-10-24](../results/reports/dc_motor/2026-10-24/REPORT.md) ·
-[analysis of both](../results/reports/dc_motor/2026-10-24/ANALYSIS.md).
+[analysis of both](../results/reports/dc_motor/2026-10-24/ANALYSIS.md) ·
+[2026-10-25, release acceptance](../results/reports/dc_motor/2026-10-25/REPORT.md) and its
+[analysis](../results/reports/dc_motor/2026-10-25/ANALYSIS.md) (81 runs: model RMSE 6.3 % of the
+setpoint, median; refit K 1.003, ramp 53.3 rpm/s: no drift in 14 days).
 Grey in every figure is the identified model running the run's own settings. It was fitted
 on 2026-10-11 data only, so every comparison below is a **prediction**.
 
