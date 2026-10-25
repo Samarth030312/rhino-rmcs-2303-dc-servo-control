@@ -1091,14 +1091,16 @@ function app = rhino_servo_lab()
             hw.kind = 'single';
         end
         hw.runner = servolab.motor.ExperimentRunner(link, x, @onRunStart, @onRunDone);
-        try
-            hw.runner.start();
-        catch err
-            hw.on = false; hw.runner = []; fault(['could not start: ' err.message]); return;
-        end
+        % the whole window is redrawn before RUN goes out: a long first render after RUN
+        % would starve the firmware's 1 s host watchdog (MOTOR-R0129, 2026-10-25)
         ui.rec.Visible = 'on'; ui.stateChip.Text = 'RUNNING'; ui.stateChip.BackgroundColor = K.cyanDim;
         setEnabled();
         say(sprintf('Running on the rig: %s. ABORT (Esc / Space) cuts motor power.', x.name), 'info');
+        try
+            hw.runner.start();                         % onRunStart, then CFG, SET, RUN
+        catch err
+            hw.on = false; hw.runner = []; fault(['could not start: ' err.message]); return;
+        end
         % last: the first tick may run at once and may already report a fault
         hwTimer = timer('ExecutionMode', 'fixedSpacing', 'Period', 0.1, 'BusyMode', 'drop', ...
             'TimerFcn', @(~, ~) safe(@hwTick));
@@ -1106,6 +1108,7 @@ function app = rhino_servo_lab()
     end
 
     function onRunStart(c, k)
+        % called just before RUN is sent: everything slow happens here, then one full render
         hw.cfg = c; hw.runStart = link.n; hw.runK = k;
         clearLive();
         if strcmp(hw.kind, 'series')
@@ -1114,6 +1117,7 @@ function app = rhino_servo_lab()
             S.y = yOf(S); profile = hw.runner.experiment.runs(k).profile; Tend = c.Tend;
             drawSim();
         end
+        drawnow;
     end
 
     function onSync()

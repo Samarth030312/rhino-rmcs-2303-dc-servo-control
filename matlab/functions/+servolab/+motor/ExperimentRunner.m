@@ -100,13 +100,15 @@ classdef ExperimentRunner < handle
     methods (Access = private)
         function startRun(obj)
             c = obj.runConfig(obj.runIndex);
+            % the caller's set-up (a simulation, a redraw) first: once RUN is sent, the
+            % firmware's 1 s watchdog needs a PING that a busy MATLAB cannot send
+            obj.onStart(c, obj.runIndex);
             obj.link.configure(c);
             obj.link.setpoint(c.setpoint);
             obj.link.run();
             obj.nEvents = size(obj.link.eventLog, 1);
             obj.tRun = obj.clock(); obj.profIdx = 1; obj.state = 'running';
             obj.message = sprintf('%s: run %d/%d', obj.experiment.name, obj.runIndex, numel(obj.experiment.runs));
-            obj.onStart(c, obj.runIndex);
         end
     end
 end
