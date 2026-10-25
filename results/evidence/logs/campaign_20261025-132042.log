@@ -1,0 +1,36 @@
+13:20:42  campaign on /dev/ttyUSB0, 9 step(s)
+13:21:01  connected: fw 886b32c · drive id 7
+13:21:06  drive check: Drive check done (register dump and loop time in the dialog and the session log).
+13:21:09  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+13:21:37  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  27 s  runs: MOTOR-R0167_20261025-132120_M1 [FINISHED], MOTOR-R0168_20261025-132134_M1 [FINISHED]  
+13:21:40  M1  RUN  Speed steps, open loop
+13:22:03  M1  DONE Speed steps, open loop  23 s  runs: MOTOR-R0169_20261025-132200_M1 [FINISHED]  
+13:22:05  M1  RUN  Direction and reversal, open loop
+13:22:20  M1  DONE Direction and reversal, open loop  15 s  runs: MOTOR-R0170_20261025-132217_M1 [FINISHED]  
+13:22:23  M2  RUN  ▶▶ all 2 runs: S3-3: static map, speed vs command
+13:23:53  M2  DONE ▶▶ all 2 runs: S3-3: static map, speed vs command  89 s  runs: MOTOR-R0171_20261025-132305_M2 [FINISHED], MOTOR-R0172_20261025-132350_M2 [FINISHED]  
+13:23:56  M3  RUN  ▶▶ all 3 runs: Speed P gain sweep
+13:24:30  M3  DONE ▶▶ all 3 runs: Speed P gain sweep  34 s  runs: MOTOR-R0173_20261025-132404_M3 [FINISHED], MOTOR-R0174_20261025-132416_M3 [FINISHED], MOTOR-R0175_20261025-132427_M3 [FINISHED]  
+13:24:33  M4  RUN  ▶▶ all 4 runs: S3-9: speed I only, Ki sweep 0.5 / 1 / 2 / 4
+13:25:26  M4  DONE ▶▶ all 4 runs: S3-9: speed I only, Ki sweep 0.5 / 1 / 2 / 4  53 s  runs: MOTOR-R0176_20261025-132443_M4 [FINISHED], MOTOR-R0177_20261025-132457_M4 [FINISHED], MOTOR-R0178_20261025-132510_M4 [FINISHED], MOTOR-R0179_20261025-132524_M4 [FINISHED]  
+13:25:29  M4  RUN  Speed I only  · Ki 1
+13:25:48  M4  DONE Speed I only  · Ki 1  19 s  runs: MOTOR-R0180_20261025-132545_M4 [FINISHED]  
+13:25:51  M5  RUN  S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder
+13:26:16  M5  DONE S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder  25 s  runs: MOTOR-R0181_20261025-132613_M5 [FINISHED]  
+13:26:18  M5  RUN  Speed PI step, 60 rpm  · Kp 0.3 Ki 1.5
+13:26:32  M5  DONE Speed PI step, 60 rpm  · Kp 0.3 Ki 1.5  14 s  runs: MOTOR-R0182_20261025-132628_M5 [FINISHED]  
+13:26:35  M5  RUN  Speed tracking, PI  · Kp 0.3 Ki 1.5
+13:26:58  M5  DONE Speed tracking, PI  · Kp 0.3 Ki 1.5  23 s  runs: MOTOR-R0183_20261025-132655_M5 [FINISHED]  
+13:27:01  M6  RUN  S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder
+13:27:16  M6  DONE S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder  15 s  runs: MOTOR-R0184_20261025-132713_M6 [FINISHED]  
+13:27:19  M7  RUN  ▶▶ all 3 runs: S3-5: position P final error, 10 deg moves
+13:27:50  M7  DONE ▶▶ all 3 runs: S3-5: position P final error, 10 deg moves  31 s  runs: MOTOR-R0185_20261025-132727_M7 [FINISHED], MOTOR-R0186_20261025-132737_M7 [FINISHED], MOTOR-R0187_20261025-132747_M7 [FINISHED]  
+13:27:52  M7  RUN  ▶▶ all 3 runs: Position P gain sweep
+13:28:23  M7  DONE ▶▶ all 3 runs: Position P gain sweep  31 s  runs: MOTOR-R0188_20261025-132759_M7 [FINISHED], MOTOR-R0189_20261025-132810_M7 [FINISHED], MOTOR-R0190_20261025-132820_M7 [FINISHED]  
+13:28:25  M7  RUN  Position moves, P (Kp 0.3): 90, -90, 360 deg  · Kp 0.3
+13:28:54  M7  DONE Position moves, P (Kp 0.3): 90, -90, 360 deg  · Kp 0.3  29 s  runs: MOTOR-R0191_20261025-132852_M7 [FINISHED]  
+13:28:58  M8  RUN  Position I only (Ki 0.1): expect oscillation  · Ki 0.1
+13:29:12  M8  DONE Position I only (Ki 0.1): expect oscillation  · Ki 0.1  15 s  runs: MOTOR-R0192_20261025-132910_M8 [FINISHED]  
+13:29:16  M9  RUN  Position PI  · Kp 0.3 Ki 0.03
+13:29:30  M9  DONE Position PI  · Kp 0.3 Ki 0.03  15 s  runs: MOTOR-R0193_20261025-132928_M9 [FINISHED]  
+13:29:32  campaign finished

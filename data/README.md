@@ -5,8 +5,9 @@ Arduino Uno and a Pro-Range 11.1 V 3S2P battery. Nothing in `raw/` is simulated,
 in it is ever edited (the app writes each file once and marks it read-only). Simulations go to
 `results/evidence/simulation_runs/`, emulator runs to a temporary folder.
 
-**112 runs** from 2026-10-11, 2026-10-23 and 2026-10-24: 105 finished, 7 stopped by the firmware
-(most of them the reverse runaway at start, before the fix; see `result` in the register).
+**193 runs** from 2026-10-11, -23, -24 and -25: 184 finished, 9 stopped by the firmware (most
+of them the reverse runaway at start, before the fix; on 2026-10-25 a watchdog stop and a false
+runaway stop, both fixed the same day; see `result` in the register).
 
 ## Layout
 
