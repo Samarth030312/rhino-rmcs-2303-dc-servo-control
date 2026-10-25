@@ -72,13 +72,13 @@ sequenceDiagram
         Uno->>Uno: e = r − y;  u = PID(e), clamped to ±uMax
         Uno->>Drv: direction + speed command
         Uno-->>App: $TEL seq, t, setpoint, measurement, error, u, counts, flags
-        App-->>Uno: $PING (watchdog: silence > 1 s cuts motor power)
+        App-->>Uno: $PING (watchdog: silence > 2 s cuts motor power)
     end
     App->>Uno: $STOP (soft: ramp to rest, then power off)
     App->>App: save data/raw/dc_motor/MOTOR-Rnnnn_….csv (read-only),<br/>metadata JSON, RUN_REGISTER.csv, a picture of the window
 ```
 
-Safety in the firmware, independent of the PC: the host watchdog (1 s), the runaway guard
+Safety in the firmware, independent of the PC: the host watchdog (2 s), the runaway guard
 (wrong direction or far too fast for two samples → motor power off), motor power off on any
 lost Modbus reply, never the drive's "hold" mode, and the STOP button on D4. Protocol:
 [serial protocol](architecture/SERIAL_PROTOCOL.md).

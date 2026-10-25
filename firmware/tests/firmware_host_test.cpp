@@ -245,7 +245,9 @@ int main(int argc, char **argv) {
   CHECK(std::find(emu.modeHistory.begin(), emu.modeHistory.end(), 0x0800) != emu.modeHistory.end(), "position run starts with SET HOME");
 
   runFor(1500, false);                                   // MATLAB goes silent
-  CHECK(emu.reg[2] == 0x0700, "host watchdog cuts motor power after 1 s");
+  CHECK(emu.reg[2] != 0x0700 && Serial.out.find("host silent") == std::string::npos, "a 1.5 s silence (a slow MATLAB frame) is tolerated");
+  runFor(1000, false);
+  CHECK(emu.reg[2] == 0x0700, "host watchdog cuts motor power after 2 s");
   CHECK(Serial.out.find("host silent") != std::string::npos, "watchdog reported to host");
 
   send("CFG,1,S,P,0.5,0,0,10,100,180"); send("SET,1,40"); send("RUN,1"); runFor(500, true);

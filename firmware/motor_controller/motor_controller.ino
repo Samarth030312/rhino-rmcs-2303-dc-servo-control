@@ -614,9 +614,11 @@ void loop() {
   if (stopping) softStopStep();
   if (!running) return;
   uint32_t now = millis();
-  if (now - tLastHost > 1000) {                      // host watchdog
+  // host watchdog: 2 s, as MATLAB's GUI can block for most of a second (measured 2026-10-25: up
+  // to 0.93 s with Simulink open). The motor stays under closed-loop control meanwhile.
+  if (now - tLastHost > 2000) {
     stopDrive(MODE_SAFE_STOP); flags |= F_WATCHDOG;
-    err("RUN", 10, "host silent >1 s - motor power off");
+    err("RUN", 10, "host silent >2 s - motor power off");
     return;
   }
   if (now - tLastSample >= (uint32_t)(cfg.Ts * 1000)) {

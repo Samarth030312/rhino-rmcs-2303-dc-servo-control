@@ -236,7 +236,7 @@ it runs.
    the run ends it is saved (raw CSV, read-only, plus metadata and a picture of the window) and
    appears under RUNS.
 5. **Stopping.** STOP, ABORT, Esc and Space cut motor power. The firmware also stops by itself
-   if MATLAB is silent for 1 s, if the motor runs away (wrong way or too fast) or if the drive
+   if MATLAB is silent for 2 s, if the motor runs away (wrong way or too fast) or if the drive
    stops answering. The state chip turns red, the status line says why and what to check, and
    **CLEAR FAULT** (highlighted) re-homes the drive before the next run.
 
@@ -272,6 +272,6 @@ motor_session_report('2026-10-23', '18:50')         % the whole session, with fi
 | "NO DRIVE answered" | Battery on? D9 → drive pin 2, D8 ← pin 3, GND; then DRIVE CHECK |
 | FAULT: runaway, wrong way | Encoder A/B or motor leads reversed (swap one pair); then CLEAR FAULT. If the wiring has not changed: see the open observation in the [2026-10-23 report](../../results/reports/dc_motor/2026-10-23/REPORT.md#safety-events) |
 | FAULT: runaway, too fast | DRIVE CHECK: LPR must be 13 |
-| FAULT: host silent | MATLAB was blocked for over a second (a modal dialog, heavy work); run again |
+| FAULT: host silent | MATLAB was blocked for over 2 s (a modal dialog, heavy work); run again |
 | Upload fails on Apple silicon ("bad CPU type") | `softwareupdate --install-rosetta --agree-to-license` |
 | The table says "—" for settling | The output never stays within the band: look at the plot, it is probably a limit cycle |

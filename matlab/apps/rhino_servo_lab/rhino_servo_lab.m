@@ -18,7 +18,7 @@ function app = rhino_servo_lab()
 %              delay) scored by one function, servolab.motor.stepMetrics.
 %
 %   Safety: ABORT (button, Esc, Space) switches motor power off; the firmware stops
-%   the drive by itself if MATLAB is silent for 1 s, if the motor runs away, or if
+%   the drive by itself if MATLAB is silent for 2 s, if the motor runs away, or if
 %   Modbus is lost. Closing the window stops the motor. Base MATLAB only.
 %
 %   Returns a struct of handles and functions, so scripts and tests can drive it.
@@ -164,6 +164,7 @@ function app = rhino_servo_lab()
         'BackgroundColor', K.bg);
     Cc.Layout.Row = 2; Cc.Layout.Column = 2;
     axR = uiaxes(Cc); axR.BackgroundColor = K.bg; rig = servolab.ui.motorRig(axR);
+    try, axR.Interactions = [rotateInteraction zoomInteraction]; catch, end   % see mkAx
     tg = uigridlayout(Cc, [2 4], 'RowHeight', {20, '1x'}, 'Padding', [12 4 12 4], 'RowSpacing', 0, ...
         'BackgroundColor', K.panel);
     names = {'SPEED  rpm', 'ANGLE  deg', 'COMMAND  rpm', 'ERROR'};
@@ -1092,7 +1093,7 @@ function app = rhino_servo_lab()
         end
         hw.runner = servolab.motor.ExperimentRunner(link, x, @onRunStart, @onRunDone);
         % the whole window is redrawn before RUN goes out: a long first render after RUN
-        % would starve the firmware's 1 s host watchdog (MOTOR-R0129, 2026-10-25)
+        % would starve the firmware's host watchdog (MOTOR-R0129, 2026-10-25)
         ui.rec.Visible = 'on'; ui.stateChip.Text = 'RUNNING'; ui.stateChip.BackgroundColor = K.cyanDim;
         setEnabled();
         say(sprintf('Running on the rig: %s. ABORT (Esc / Space) cuts motor power.', x.name), 'info');
@@ -1165,7 +1166,7 @@ function app = rhino_servo_lab()
             end
             poseAt('live', T.t_s(end));
             autoAxes();
-            drawnow limitrate; link.poll();             % render now, then PING again: a slow frame never starves the 1 s watchdog
+            drawnow limitrate; link.poll();             % render now, then PING again: a slow frame never starves the 2 s watchdog
         end
         ev = link.eventLog; idx = [];
         if ~isempty(ev), idx = find(strcmp(ev(:, 2), 'ERR') & startsWith(string(ev(:, 3)), ["RUN,", "HOME,"])); end
@@ -1229,7 +1230,7 @@ function app = rhino_servo_lab()
         if contains(r, 'wrong way'),      s = 'The motor turned against the command: check the encoder wires (pins 10/11) and that the drive restarted cleanly.';
         elseif contains(r, 'too fast'),   s = 'The motor ran faster than commanded: check the encoder and the drive line count (DRIVE CHECK: LPR 13).';
         elseif contains(r, 'modbus'),     s = 'The drive stopped answering: battery on? D8/D9/GND to the drive?';
-        elseif contains(r, 'host silent'), s = 'MATLAB was busy for over 1 s; close other heavy work and run again.';
+        elseif contains(r, 'host silent'), s = 'MATLAB was busy for over 2 s; close other heavy work and run again.';
         elseif contains(r, 'estopped'),   s = 'A previous fault is still latched.';
         else,                             s = '';
         end
@@ -1399,6 +1400,9 @@ function app = rhino_servo_lab()
         title(ax, ttl, 'Color', K.text, 'FontWeight', 'bold', 'FontSize', 10.5);
         ax.TitleHorizontalAlignment = 'left';
         try, ax.Toolbar.Visible = 'off'; catch, end
+        % explicit interactions, set now: MATLAB otherwise builds its default set on the first
+        % render after a change, synchronously, which can block a live run for most of a second
+        try, ax.Interactions = [panInteraction zoomInteraction dataTipInteraction]; catch, end
     end
     function h = lbl(parent, txt, sz, col, wt)
         h = uilabel(parent, 'Text', txt, 'FontSize', sz, 'FontColor', col, 'FontWeight', wt);

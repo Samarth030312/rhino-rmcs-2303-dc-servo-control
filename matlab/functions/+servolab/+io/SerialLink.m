@@ -13,7 +13,7 @@ classdef SerialLink < handle
 %   against a fake transport; the firmware compiles; NOT yet run on a real board.
 %
 %   Safety design: the firmware is specified to STOP the drive if it hears
-%   nothing from the host for 1 s while running. poll() sends a PING every
+%   nothing from the host for 2 s while running. poll() sends a PING every
 %   0.25 s while running, so a hung MATLAB stops the motor rather than leaving
 %   it under the last command.
 %

@@ -22,7 +22,7 @@ each problem comes with its fix. Installation problems per system: [install](../
 | "no drive answered" | battery off or below 10 V; D8/D9 swapped; GND missing | battery; D9 → drive pin 2, D8 ← pin 3, GND → pin 1 |
 | `runaway: wrong way` on the first run | encoder A/B or motor leads reversed | swap **one** pair (motor leads 14/15 or A/B 10/11), never both |
 | `runaway: too fast` | LPR not 13 (every speed 25.7× wrong); or a reverse runaway at start | DRIVE CHECK must show LPR 13; firmware e60d046+ re-homes at every RUN |
-| `host silent >1 s - motor power off` | MATLAB stopped sending (frozen, closed, laptop asleep) | CLEAR FAULT, RUN again |
+| `host silent >2 s - motor power off` | MATLAB stopped sending (frozen, closed, laptop asleep) | CLEAR FAULT, RUN again |
 | `modbus feedback lost` | loose wire, battery sagging, electrical noise | wiring, battery; the firmware stops the motor rather than act on stale data |
 | speeds stop at 140–150 rpm | battery nearly empty (free speed ∝ voltage) | charge it (12.6 V full) |
 | the rig is slower or faster than the grey line | another acceleration register, battery or load | IDENTIFY FROM SELECTED RUN on one of your open-loop runs |
