@@ -96,6 +96,8 @@ uint32_t tStopStart = 0, tStopSample = 0;
 float stopLastAbs = 0;
 long stopLastCounts = 0;
 bool stopHaveCounts = false;
+const uint32_t HOME_WAIT_MS = 500;               // longest wait for the drive to zero its count after HOME
+const long HOME_ZERO_COUNTS = 200;               // "near zero": 14 deg at the output, far above any jerk at rest
 const long STOP_REST_COUNTS = 9;                   // per 100 ms: 1 output rpm (5200 counts per rev)
 // BRIDGE: the Uno becomes a transparent USB <-> drive link at the drive's 9600 baud, so the
 // manufacturer's configuration software (Windows) reaches the drive without rewiring. Opening
@@ -341,10 +343,16 @@ static void handleLine(char *line) {
     // (2026-10-24). Let the estimate settle before the speed mode word enables the motor.
     bool ok = mbWrite(REG_MODE, MODE_HOME);
     if (ok) delay(150);
-    ok = ok && commandSpeed(0);
-    if (ok && cfg.loop == 'E') {                       // reference count for the first difference
-      ok = readPosition(lastCounts); haveCounts = ok; tLastCounts = millis();
+    // The drive zeroes its position count some time after HOME. Until it has, the count is the
+    // old one: an encoder speed differenced across the reset read 10-46 rpm at rest in 34 of 72
+    // runs (2026-10-11 to -25), and a position loop would see a stale angle. Wait for the count
+    // to read near zero (the motor is at rest), at most 0.5 s.
+    for (uint32_t t0 = millis(); ok && millis() - t0 < HOME_WAIT_MS; delay(20)) {
+      long c = 0;
+      if (!readPosition(c)) { ok = false; break; }
+      if (labs(c) <= HOME_ZERO_COUNTS) break;
     }
+    ok = ok && commandSpeed(0);
     if (!ok) { stopDrive(MODE_SAFE_STOP); err(t, 9, "drive did not answer (modbus): check 12 V and wiring"); return; }
     running = true; tStart = tLastSample = millis();
     digitalWrite(PIN_LED, HIGH);
@@ -423,6 +431,9 @@ static void controlSample() {
     if (ok) {
       posCounts = counts;
       // actual time between the two reads, not the nominal Ts (Modbus timing jitters)
+      // the first sample of a run is the reference count: speed 0 (the run starts at rest after
+      // HOME), as in the MATLAB and Simulink models
+      meas = 0;
       if (haveCounts && tc != tLastCounts) meas = (counts - lastCounts) / CPR_OUT * 60000.0f / (tc - tLastCounts);
       lastCounts = counts; tLastCounts = tc; haveCounts = true;
     }

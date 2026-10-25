@@ -13,6 +13,7 @@
 #include "AltSoftSerial.h"
 #include <map>
 #include <deque>
+#include <sstream>
 #include <vector>
 
 #include <chrono>
@@ -57,6 +58,7 @@ struct Drive {
   bool coarseSpeed = false;                  // speed register in 461.5 base-rpm steps (4.6 output rpm), as on the lab drive
   double speedAtOff = 0;                     // base rpm when motor power was last switched off (0x0700)
   double deadMs = 0, now = 0;                // dead time between a command and the motor's response
+  double homeLagMs = 0, homeAt = -1;         // the drive zeroes its position count this long after HOME
   std::deque<std::pair<double, double>> targets;
   std::string line; int frames = 0, writes = 0;
   std::string injectAfterNextFrame;          // a late reply from another slave, delivered right after a request
@@ -67,6 +69,7 @@ struct Drive {
     if (encoderReversed && target != 0) target = (target > 0 ? -1 : 1) * 16600.0;   // flat out, wrong way
     if (encoderReversed && m == 0x0701) target = -16600.0;   // "hold position" with reversed encoder runs away (2026-10-11)
     now += dt_ms; targets.push_back({now, target});
+    if (homeAt >= 0 && now >= homeAt) { pos = 0; homeAt = -1; }
     while (targets.size() > 1 && targets[1].first <= now - deadMs) targets.pop_front();
     target = targets.front().second;
     // the lab drive's acceleration register (5000) as a ramp limit in base rpm/s, then a 50 ms lag
@@ -97,7 +100,7 @@ struct Drive {
     int a = b[2] << 8 | b[3]; uint16_t d = b[4] << 8 | b[5];
     if (b[1] == 6) {
       reg[a] = d; writes++;
-      if (a == 2) { modeHistory.push_back(d); if (d == 0x0800) pos = 0; if (d == 0x0700) speedAtOff = speed; }
+      if (a == 2) { modeHistory.push_back(d); if (d == 0x0800) { if (homeLagMs > 0) homeAt = now + homeLagMs; else pos = 0; } if (d == 0x0700) speedAtOff = speed; }
       reply({b[0], 6, b[2], b[3], b[4], b[5]});
     } else if (b[1] == 3) {
       std::vector<uint8_t> r = {b[0], 3, (uint8_t)(2 * d)};
@@ -218,6 +221,32 @@ int main(int argc, char **argv) {
   send("STOP,1,NOW"); runFor(50, false);
   CHECK(emu.reg[2] == 0x0700, "STOP,1,NOW while turning: motor power off at once");
 
+  // encoder speed, first sample: the lab drive zeroes its count some time after HOME, so a
+  // difference across the reset read 10-46 rpm with the motor at rest in 34 of 72 runs
+  // (2026-10-11 to -25, e.g. MOTOR-R0200). The first sample is the baseline: speed 0.
+  {
+    emu.homeLagMs = 300; emu.pos = -400;
+    size_t m0 = Serial.out.size();
+    send("CFG,1,E,PI,0.3,2.5,0,10,100,0"); send("SET,1,0"); send("RUN,1");
+    runFor(1000, true);
+    size_t f = Serial.out.find("$TEL,1,0,", m0);            // this run's first frame
+    double first = NAN, second = NAN;
+    if (f != std::string::npos) {
+      std::vector<std::string> v; std::string line = Serial.out.substr(f, Serial.out.find('\n', f) - f), tok;
+      std::stringstream ss(line); while (std::getline(ss, tok, ',')) v.push_back(tok);
+      if (v.size() > 7) first = atof(v[7].c_str());
+      size_t g = Serial.out.find("$TEL,1,1,", f);
+      if (g != std::string::npos) {
+        std::vector<std::string> w; std::stringstream s2(Serial.out.substr(g, Serial.out.find('\n', g) - g));
+        while (std::getline(s2, tok, ',')) w.push_back(tok);
+        if (w.size() > 7) second = atof(w[7].c_str());
+      }
+    }
+    printf("        encoder speed after HOME (count reset 0.3 s late): first sample %.3f rpm, second %.3f rpm\n", first, second);
+    CHECK(fabs(first) < 0.5 && fabs(second) < 0.5, "encoder speed: no difference across the drive's late count reset (first samples 0)");
+    CHECK(fabs(lastTelField(5)) < 0.5, "encoder speed: still at rest after the drive's count reset");
+    send("STOP,1,NOW"); runFor(200, false); emu.homeLagMs = 0;
+  }
   // speed from encoder counts (loop E): same PI, feedback = counts differenced over Ts
   send("CFG,1,E,PI,0.3,2.5,0,10,100,180"); send("SET,1,40"); send("RUN,1");
   runFor(5000, true);
