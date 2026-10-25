@@ -53,6 +53,8 @@ struct Drive {
   std::map<int, uint16_t> reg = {{0, 0x0BFF}, {2, 0}, {4, 32}, {6, 16}, {8, 32}, {10, 334}, {12, 20000}, {14, 0}};
   double speed = 0, pos = 0, ramp = 0;      // base rpm, counts, ramped setpoint
   bool encoderReversed = false;              // wiring fault: drive sees -speed and runs away
+  bool coarseSpeed = false;                  // speed register in 461.5 base-rpm steps (4.6 output rpm), as on the lab drive
+  double speedAtOff = 0;                     // base rpm when motor power was last switched off (0x0700)
   std::string line; int frames = 0, writes = 0;
   std::string injectAfterNextFrame;          // a late reply from another slave, delivered right after a request
   std::vector<uint16_t> modeHistory;
@@ -89,13 +91,13 @@ struct Drive {
     int a = b[2] << 8 | b[3]; uint16_t d = b[4] << 8 | b[5];
     if (b[1] == 6) {
       reg[a] = d; writes++;
-      if (a == 2) { modeHistory.push_back(d); if (d == 0x0800) pos = 0; }
+      if (a == 2) { modeHistory.push_back(d); if (d == 0x0800) pos = 0; if (d == 0x0700) speedAtOff = speed; }
       reply({b[0], 6, b[2], b[3], b[4], b[5]});
     } else if (b[1] == 3) {
       std::vector<uint8_t> r = {b[0], 3, (uint8_t)(2 * d)};
       for (int k = 0; k < d; k++) {
         uint16_t v = reg[a + k];
-        if (a + k == 24) v = (uint16_t)(int16_t)lround(speed);
+        if (a + k == 24) v = (uint16_t)(int16_t)(coarseSpeed ? std::trunc(speed / 461.5) * 461.5 : lround(speed));
         if (a + k == 20) v = (uint32_t)(int32_t)lround(pos) & 0xFFFF;
         if (a + k == 21) v = ((uint32_t)(int32_t)lround(pos)) >> 16;
         r.push_back(v >> 8); r.push_back(v & 0xFF);
@@ -194,11 +196,16 @@ int main(int argc, char **argv) {
   CHECK(emu.reg[2] == 0x0109, "negative command switches drive to CCW");
   CHECK(fabs(lastTelField(5) + 30) < 1.0, "speed PI reaches -30 rpm");
 
-  // soft stop: at -30 rpm the motor is brought to rest on the drive's ramp before power goes off
+  // soft stop: at -30 rpm the motor is brought to rest on the drive's ramp before power goes off.
+  // The lab drive's speed register reads 0 below 4.6 rpm (2026-10-25, MOTOR-R0114), so rest is
+  // also judged from the encoder position.
+  emu.coarseSpeed = true;
   send("STOP,1"); runFor(100, false);
   CHECK(emu.reg[2] == 0x0109 && emu.reg[14] == 0, "STOP while turning: speed 0 commanded, motor power still on (soft stop)");
   runFor(2000, false);
-  CHECK(emu.reg[2] == 0x0700 && fabs(emu.speed) < 1, "soft stop: at rest, then motor power off (0x0700), never hold");
+  printf("        soft stop from -30 rpm: motor power off at %.2f rpm\n", emu.speedAtOff / 100.0);
+  CHECK(emu.reg[2] == 0x0700 && fabs(emu.speedAtOff) < 100, "soft stop: power off only at rest (< 1 rpm by the encoder), never hold");
+  emu.coarseSpeed = false;
   CHECK(Serial.out.find("ms to rest, motor power off") != std::string::npos, "soft stop reports its time to rest");
   // STOP,1,NOW (the app's ABORT) cuts power at once
   send("CFG,1,S,PI,0.3,2.5,0,10,100,180"); send("SET,1,50"); send("RUN,1"); runFor(3000, true);

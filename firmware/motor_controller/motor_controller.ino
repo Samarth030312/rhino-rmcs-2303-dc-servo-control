@@ -94,6 +94,9 @@ const uint32_t STOP_RAMP_MAX_MS = 4000;           // 180 rpm at the 53 rpm/s ram
 bool stopping = false;
 uint32_t tStopStart = 0, tStopSample = 0;
 float stopLastAbs = 0;
+long stopLastCounts = 0;
+bool stopHaveCounts = false;
+const long STOP_REST_COUNTS = 9;                   // per 100 ms: 1 output rpm (5200 counts per rev)
 // BRIDGE: the Uno becomes a transparent USB <-> drive link at the drive's 9600 baud, so the
 // manufacturer's configuration software (Windows) reaches the drive without rewiring. Opening
 // a port resets a CH340 Uno, so the mode is kept in EEPROM and survives resets until
@@ -230,21 +233,23 @@ static void beginSoftStop() {
   digitalWrite(PIN_LED, LOW);
   if (!slaveId || !mbWrite(REG_SPEED, 0)) { stopDrive(MODE_SAFE_STOP); return; }   // keeps the direction word
   lastCmd = 0;
-  stopping = true; tStopStart = tStopSample = millis(); stopLastAbs = 1e9;
+  stopping = true; tStopStart = tStopSample = millis(); stopLastAbs = 1e9; stopHaveCounts = false;
 }
 
-// every 100 ms while stopping: power off once the drive reads rest, or at once if the motor
-// speeds up, the drive does not answer, or the ramp takes longer than it can
+// every 100 ms while stopping: power off once the motor is at rest, or at once if it speeds
+// up, the drive does not answer, or the ramp takes longer than it can. The speed register reads
+// in 4.6 rpm steps and shows 0 below that, so rest also needs the encoder still (< 1 rpm).
 static void softStopStep() {
   uint32_t now = millis();
   if (now - tStopSample < 100) return;
   tStopSample = now;
-  int spd = 0;
-  bool ok = readSpeed(spd);
+  int spd = 0; long c = 0;
+  bool ok = readSpeed(spd) && readPosition(c);
   float a = ok ? fabs(spd / GEAR) : 1e9f;
-  bool rest = ok && a < 1.0f;                        // the register reads in 4.6 rpm steps: 0 = rest
+  bool still = ok && stopHaveCounts && labs(c - stopLastCounts) <= STOP_REST_COUNTS;
+  bool rest = ok && a < 1.0f && still;
   bool bad = !ok || a > stopLastAbs + 5.0f || now - tStopStart > STOP_RAMP_MAX_MS;
-  stopLastAbs = a;
+  stopLastAbs = a; stopLastCounts = c; stopHaveCounts = ok;
   if (rest || bad) {
     stopDrive(MODE_SAFE_STOP);
     Serial.print(F("# soft stop: ")); Serial.print(now - tStopStart);
