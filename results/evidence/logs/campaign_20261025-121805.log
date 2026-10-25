@@ -1,0 +1,23 @@
+12:18:05  campaign on /dev/ttyUSB0, 9 step(s)
+12:18:23  connected: fw 8e478f9 · drive id 7
+12:18:28  drive check: Drive check done (register dump and loop time in the dialog and the session log).
+12:18:31  M1  RUN  S3-2/S3-4: open-loop step 0 -> 60 rpm  · run 1/2
+12:18:46  M1  DONE S3-2/S3-4: open-loop step 0 -> 60 rpm  · run 1/2  15 s  runs: MOTOR-R0122_20261025-121841_M1 [FINISHED]  
+12:18:49  M2  RUN  S3-3: static map, speed vs command  · run 1/2, encoder
+12:19:35  M2  DONE S3-3: static map, speed vs command  · run 1/2, encoder  45 s  runs: MOTOR-R0123_20261025-121930_M2 [FINISHED]  
+12:19:39  M3  RUN  Speed P gain sweep  · run 1/3: Kp 0.2
+12:19:50  M3  DONE Speed P gain sweep  · run 1/3: Kp 0.2  11 s  runs: MOTOR-R0124_20261025-121947_M3 [FINISHED]  
+12:19:53  M4  RUN  Speed I only  · Ki 1
+12:20:13  M4  DONE Speed I only  · Ki 1  19 s  runs: MOTOR-R0125_20261025-122009_M4 [FINISHED]  
+12:20:16  M5  RUN  S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder
+12:20:42  M5  DONE S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder  27 s  runs: MOTOR-R0126_20261025-122038_M5 [FINISHED]  
+12:20:46  M6  RUN  S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder
+12:21:02  M6  DONE S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder  16 s  runs: MOTOR-R0127_20261025-122058_M6 [FINISHED]  
+12:21:06  M7  RUN  S3-5: position P final error, 10 deg moves  · run 1/3: Kp 0.1
+12:21:17  M7  DONE S3-5: position P final error, 10 deg moves  · run 1/3: Kp 0.1  11 s  runs: MOTOR-R0128_20261025-122114_M7 [FINISHED]  
+12:21:20  M8  RUN  Position I only (Ki 0.1): expect oscillation  · Ki 0.1
+12:21:26  M8  DONE Position I only (Ki 0.1): expect oscillation  · Ki 0.1  6 s  runs: MOTOR-R0129_20261025-122122_M8 [STOPPED: host silent >1 s - motor power off]  FAULT host silent >1 s - motor power off
+12:21:27  cleared fault, state READY
+12:21:31  M9  RUN  Position PI  · Kp 0.3 Ki 0.03
+12:21:47  M9  DONE Position PI  · Kp 0.3 Ki 0.03  16 s  runs: MOTOR-R0130_20261025-122143_M9 [FINISHED]  
+12:21:49  campaign finished
