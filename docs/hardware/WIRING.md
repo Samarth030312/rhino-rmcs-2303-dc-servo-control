@@ -145,7 +145,7 @@ plugged in. Consequences:
 2. Flash:
    ```bash
    cd ~/Projects/rhino-rmcs-2303-dc-servo-control
-   scripts/setup/upload motor            # auto-detects the Uno; or: scripts/setup/upload motor /dev/ttyACM0
+   scripts/setup/upload                  # auto-detects the Uno; or: scripts/setup/upload /dev/ttyUSB0
    ```
    Expect "Sketch uses … bytes" and an avrdude "bytes written / verified" message.
 3. Serial Monitor check (optional): Arduino IDE (`~/Applications/arduino-ide_2.3.10_Linux_64bit.AppImage`)

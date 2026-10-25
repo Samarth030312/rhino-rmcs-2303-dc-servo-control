@@ -8,7 +8,7 @@ Applies to every rig run of this repository (MOTOR-Rnnnn).
 
 1. A clean tree (`git status`), or accept that the firmware revision will say `-dirty`.
 2. Wiring checked against [wiring](hardware/WIRING.md); the [checklist](safety/EXPERIMENT_CHECKLIST.md) ticked; a photo of the rig.
-3. The firmware flashed from the app (or `motor` with `scripts/setup/upload`); CONNECT shows its `$HELLO`; DRIVE CHECK.
+3. The firmware flashed from the app (or `scripts/setup/upload`); CONNECT shows its `$HELLO`; DRIVE CHECK.
 
 ## 2. During the run
 

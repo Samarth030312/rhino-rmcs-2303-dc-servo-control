@@ -19,7 +19,7 @@ matlab -r "cd('$HOME/rhino-rmcs-2303-dc-servo-control'); setup open"
 ```
 
 Shell helpers (same toolchain as MATLAB): `scripts/setup/acli board list`,
-`scripts/setup/upload motor /dev/ttyUSB0`, `scripts/validation/build_firmware.sh`.
+`scripts/setup/upload /dev/ttyUSB0` (compile and upload), `scripts/validation/host_tests.sh` (the firmware against its emulated plant, on the PC).
 
 ## Notes
 

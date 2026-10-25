@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
-# Compile and upload one ENR312 sketch to an Arduino Uno with the isolated toolchain.
-#   scripts/setup/upload motor|temperature|level [port] [extra -D flags...]
-#   e.g. scripts/setup/upload temperature /dev/ttyACM0 -DLCD_I2C -DDHT_KIND=DHT11
+# Compile and upload the DC servo sketch to an Arduino Uno with the project's own toolchain.
+#   scripts/setup/upload [port] [extra -D flags...]
+#   e.g. scripts/setup/upload /dev/ttyUSB0
 set -euo pipefail
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 acli="$root/scripts/setup/acli"
-case "${1:-}" in
-  motor)       sketch="$root/firmware/motor_controller" ;;
-  temperature) sketch="$root/temperature/firmware/temperature_controller" ;;
-  level)       sketch="$root/water_level/firmware/level_controller" ;;
-  *) echo "usage: $0 motor|temperature|level [port] [-DFLAG ...]"; exit 2 ;;
-esac
-port="${2:-}"
+sketch="$root/firmware/motor_controller"
+[ "${1:-}" = "motor" ] && shift          # the older form: upload motor [port]
+port=""
+case "${1:-}" in -*|"") ;; *) port="$1"; shift ;; esac   # no port given: auto-detect
 if [ -z "$port" ]; then
   port="$("$acli" board list | awk '/arduino:avr:uno/ {print $1; exit}')"
   # clone Unos with a CH340 USB chip report "Unknown": fall back to the first USB serial port
   [ -n "$port" ] || port="$(ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null | head -1)"
   [ -n "$port" ] || { echo "No Uno found. Plug it in or give the port (e.g. /dev/ttyACM0)."; "$acli" board list; exit 1; }
 fi
-shift $(( $# >= 2 ? 2 : $# ))
 rev="$(git -C "$root" rev-parse --short HEAD 2>/dev/null || echo nogit)"
 [ -z "$(git -C "$root" status --porcelain --untracked-files=no 2>/dev/null)" ] || rev="$rev-dirty"
 flags="-DFW_REV=\"$rev\" $*"

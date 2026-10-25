@@ -2,9 +2,11 @@
 # Arduino IDE (Linux AppImage, extracted) bound to this project's cores/libraries (scripts/setup/env.sh).
 # The ARDUINO_DIRECTORIES_* variables override the IDE's own config for this launch only;
 # the IDE's global settings and ~/Arduino are not modified.
-#   scripts/setup/arduino-ide [sketch.ino]      default: the DC-motor sketch
+#   scripts/setup/arduino-ide [sketch.ino]      default: the DC servo sketch
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 . "$root/scripts/setup/env.sh"
 sketch="${1:-$root/firmware/motor_controller/motor_controller.ino}"
-# The AppImage needs FUSE (not installed); run the extracted copy instead.
-exec "$HOME/Applications/arduino-ide-2.3.10/squashfs-root/arduino-ide" --no-sandbox "$sketch"
+# ARDUINO_IDE: the IDE executable. Default: arduino-ide on the PATH, else an extracted AppImage
+# (an AppImage needs FUSE; the extracted copy does not).
+ide="${ARDUINO_IDE:-$(command -v arduino-ide || echo "$HOME/Applications/arduino-ide-2.3.10/squashfs-root/arduino-ide")}"
+exec "$ide" --no-sandbox "$sketch"
