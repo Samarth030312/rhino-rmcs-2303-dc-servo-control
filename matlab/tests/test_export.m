@@ -9,7 +9,7 @@ end
 
 function testExportWritesLabelledEvidence(tc)
     tmp = tc.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture);
-    c = servolab.motor.presetConfig('Rig - speed - PI, Kp 0.3 Ki 1.5');
+    c = specOf('M5', 'Speed PI step to 60 rpm');       % Kp 0.3, Ki 1.5, on the drive physics
     S = servolab.motor.simulate(c);
     out = servolab.motor.exportRun(S, tmp.Folder);
     tc.verifyTrue(startsWith(out.runId, 'MOTOR-07-SIM-'));
@@ -29,9 +29,14 @@ end
 
 function testRunIdsAreNeverReused(tc)
     tmp = tc.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture);
-    S = servolab.motor.simulate(servolab.motor.presetConfig('Rig - speed - P, Kp 0.5'));
+    S = servolab.motor.simulate(specOf('M3', 'run 2/3: Kp 0.5'));
     ids = cell(1, 3);
     for k = 1:3, o = servolab.motor.exportRun(S, tmp.Folder); ids{k} = o.runId; end
     tc.verifyEqual(numel(unique(ids)), 3);
     tc.verifyEqual(numel(dir(fullfile(tmp.Folder, 'MOTOR-05-SIM-*'))), 3);
+end
+
+function c = specOf(mission, label)
+    L = servolab.motor.presets(mission);
+    c = servolab.motor.specConfig(L(find(contains({L.label}, label), 1)).spec);
 end

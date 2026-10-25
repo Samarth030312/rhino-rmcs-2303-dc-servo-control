@@ -7,7 +7,7 @@ function ok = e2e_motor_mission_control(simBinary)
 %   (firmware/tests/firmware_host_test.cpp, --pty mode) and runs in real time on a
 %   pseudo-terminal with an emulated drive. The app is driven through its own functions:
 %   connect, DRIVE CHECK, a LAB run with live setpoint changes, a latched fault and
-%   CLEAR FAULT, a course experiment saved as raw data, and ABORT. Data and logs go to a
+%   CLEAR FAULT, a mission's hardware experiment saved as raw data, and ABORT. Data and logs go to a
 %   temporary folder. Everything except the physical wiring is exercised.
     tmp = tempname; mkdir(tmp);
     setenv('SERVOLAB_DATA_ROOT', tmp); setenv('SERVOLAB_LOG_DIR', tmp);
@@ -65,9 +65,9 @@ function ok = e2e_motor_mission_control(simBinary)
     app.clearFault(); pause(0.3);
     ok = check(strcmp(app.ui.stateChip.Text, 'READY') && isempty(app.state().fault), 'CLEAR FAULT: READY again') & ok;
 
-    % ---- a course experiment from a mission: direction and reversal (12 s), both directions, no false trip
+    % ---- a hardware experiment from a mission: open-loop reversal (12 s), both directions, no false trip
     app.selectMission(1);
-    items = app.ui.preset.Items; k = find(contains(items, 'Direction and reversal'), 1);
+    items = app.ui.preset.Items; k = find(contains(items, 'Open-loop reversal'), 1);
     app.setPreset(k);
     app.runRig(); t1 = tic; pause(1); while app.state().on && toc(t1) < 20, pause(0.2); end
     raw = dir(fullfile(tmp, 'data', 'raw', 'dc_motor', 'MOTOR-R*_M1.csv'));
@@ -78,7 +78,7 @@ function ok = e2e_motor_mission_control(simBinary)
     end
     ok = check(~contains(fileread(log), 'runaway'), 'no runaway trip during the commanded reversal') & ok;
     I = app.runs();
-    ok = check(height(I) >= 1 && any(contains(I.name, 'Direction')), 'RUNS lists the new run') & ok;
+    ok = check(height(I) >= 1 && any(strcmp(I.key, 'ol_reversal')), 'RUNS lists the new run') & ok;
 
     % ---- ABORT during a run
     app.runRig(); pause(1.5);

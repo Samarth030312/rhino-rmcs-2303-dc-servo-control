@@ -1,5 +1,5 @@
 function tests = test_motor_identified
-%TEST_MOTOR_IDENTIFIED  Identified rig model: fitting, MATLAB vs Simulink, course S3 behaviours.
+%TEST_MOTOR_IDENTIFIED  Identified rig model: fitting, MATLAB vs Simulink, the behaviours seen on the rig.
     tests = functiontests(localfunctions);
 end
 

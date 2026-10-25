@@ -1,10 +1,11 @@
 function R = run_dc_motor_simulink(c, modelDir)
-%RUN_DC_MOTOR_SIMULINK  Run servo_armature.slx with an servolab.motor config.
+%RUN_DC_MOTOR_SIMULINK  Run servo_armature.slx with a servolab.motor config (plant 'bare').
 %
-%   R = run_dc_motor_simulink(servolab.motor.presetConfig('Bare motor - speed - PI + load'))
+%   L = servolab.motor.presets('M10'); R = run_dc_motor_simulink(servolab.motor.specConfig(L(3).spec))
+%   (or servolab.motor.runSimulink, which picks the model from the config's plant)
 %
-%   R.t, R.y (true output in the loop's units), R.u (volts), R.i (A), R.ym
-%   (measured, at the controller samples). Builds the model if it is missing.
+%   R.t, R.y (true output in the loop's units), R.u (volts), R.i (A), R.ym (measured), on the
+%   output grid; R.tk, R.measK, R.uK at the controller samples. Builds the model if it is missing.
 %   modelDir (optional) is where the .slx lives; default is this folder.
 
     here = fileparts(mfilename('fullpath'));
@@ -24,15 +25,18 @@ function R = run_dc_motor_simulink(c, modelDir)
                               'OutputTimes', mat2str(tGrid'));
     out = sim(in);
 
-    y = out.yout;
-    % Outports in port order: 1 speed_rpm, 2 angle_deg, 3 u_volts, 4 current_A, 5 measured
-    val = @(k) y.getElement(k).Values;
-    spd = val(1); ang = val(2);
-    R.t = spd.Time;
-    if strcmp(c.loop, 'speed'), R.y = spd.Data; else, R.y = ang.Data; end
-    R.u = val(3).Data;
-    R.i = val(4).Data;
-    R.ym = val(5).Data;
+    val = simulink_outputs(out.yout);
+    R.t = val.y_true_speed_rpm.Time;
+    if strcmp(c.loop, 'speed'), R.y = val.y_true_speed_rpm.Data; else, R.y = val.y_true_angle_deg.Data; end
+    on = @(x) interp1(x.Time, x.Data(:), R.t, 'previous', 'extrap');   % sampled signals onto R.t
+    R.u = on(val.u_volts);
+    R.i = on(val.current_A);
+    R.ym = on(val.measured);
+    % controller samples: outputs are logged at fixed times, and at a sample instant the log can
+    % still hold the value from before the hold updates, so read 1.5 plant steps after it
+    R.tk = (0:c.Ts:c.Tend + 1e-9)';
+    R.measK = interp1(R.t, R.ym, R.tk + 1.5 * c.dt, 'previous', 'extrap');
+    R.uK = interp1(R.t, R.u, R.tk + 1.5 * c.dt, 'previous', 'extrap');
     R.cfg = c;
     R.simulinkVersion = ver('simulink').Version;
 end

@@ -3,7 +3,7 @@ function S = identifiedSim(m, c, profile, Tend)
 %
 %   S = servolab.motor.identifiedSim(m, c, profile, Tend)
 %
-%   This is the model the course MOTOR handout (S3-4, S3-7) asks for: built from the
+%   Built from the rig's measured step responses (servolab.motor.rigModel), not from motor constants;
 %   measured step responses, not from motor constants. Signal path (all output-shaft rpm):
 %
 %     Arduino (pidStep every c.Ts, command applied c.latency later, |u| <= c.uMax)
@@ -20,7 +20,7 @@ function S = identifiedSim(m, c, profile, Tend)
 %
 %   m: K, tau, theta, acc, dz, qSpd, backlash (deg), sensorAtLoad (logical)
 %   c: loop 'speed'|'position', ctrl 'OL'|'P'|'I'|'PI'|'PID', Kp Ki Kd Tf Ts uMax latency,
-%      quant (logical), spdFb, antiWindup (default true; false = plain integrator, for S3-12)
+%      quant (logical), spdFb, antiWindup (default true; false = plain integrator, to show windup)
 %   profile: [t_s, setpoint] (setpoint held between rows); Tend: s
 %
 %   S.t, S.w, S.thMotor, S.thOut, S.uApplied   fine grid (dt = 1 ms)
@@ -96,7 +96,7 @@ function S = identifiedSim(m, c, profile, Tend)
 end
 
 function [u, st, sat] = pidNoAntiWindup(st, e, g)
-    % the same law with a plain integrator (what S3-12 warns about)
+    % the same law with a plain integrator: it winds up while the output saturates
     if st.first, d = 0; else, d = (g.Tf * st.d + g.Kd * (e - st.e)) / (g.Tf + g.Ts); end
     st.i = st.i + g.Ki * g.Ts * e;
     uRaw = g.Kp * e + st.i + d;

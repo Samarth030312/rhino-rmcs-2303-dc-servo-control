@@ -1,21 +1,21 @@
 function app = rhino_servo_lab()
-%SERVOLAB_MOTOR  Rhino DC servo (RMCS-2303 + RMCS-5032): mission control for the rig and its identified model.
+%RHINO_SERVO_LAB  Rhino DC servo (RMCS-2303 drive + RMCS-5032 motor): simulate, run on the rig, compare.
 %
-%   cd <repo>/matlab; setup            (or: run('setup_path.m'); rhino_servo_lab)
+%   setup open          (from the repository root; or: run('matlab/setup_path.m'); rhino_servo_lab)
 %
-%   MISSIONS M1-M9 follow the ENR312 MOTOR handout (open loop, static map, speed P / I /
-%   PI, windup, position P / I / PI); LAB is free use. Each mission's presets are the
-%   runs of its course hardware experiment (servolab.motor.hwExperiments).
-%
-%   SIMULATE   servolab.motor.identifiedSim: the Arduino's loop (sampling, 70 ms Modbus
-%              latency, clamping anti-windup, quantised feedback) around the rig model
-%              identified from its own steps (servolab.motor.rigModel). Reruns 0.25 s
-%              after any change.
+%   MISSIONS   M1-M9: open loop, static map, speed P / I / PI, windup, position P / I / PI;
+%              M10: the bare motor driven by voltage; LAB: free use. Each mission's presets
+%              are hardware experiments (servolab.motor.presets, servolab.motor.hwExperiments).
+%   PLANT      RIG · identified (servolab.motor.identifiedSim, fitted to the rig's runs),
+%              RIG · drive + motor physics (servolab.motor.simulate, datasheet values, load
+%              and inertia), MOTOR · armature (the bare motor). servolab.motor.simulatePlant
+%              runs any of them; OPEN IN SIMULINK opens the matching model with the same
+%              settings. Reruns 0.25 s after any change.
 %   RIG        the same settings on the Arduino + RMCS-2303 (protocol v1). Every rig run is
 %              saved automatically (data/raw/dc_motor) and listed under RUNS, where any
 %              run can be overlaid on the simulation and replayed on the 3-D rig.
-%   TABLE      SIM, RIG and REF (the course's first-order model, K 1, tau 0.72 s, no
-%              delay) scored by one function, servolab.motor.stepMetrics.
+%   TABLE      SIM, RIG and REF (first-order theory: K 1, tau 0.72 s, no delay) scored by
+%              one function, servolab.motor.stepMetrics.
 %
 %   Safety: ABORT (button, Esc, Space) switches motor power off; the firmware stops
 %   the drive by itself if MATLAB is silent for 2 s, if the motor runs away, or if
@@ -196,7 +196,7 @@ function app = rhino_servo_lab()
     tr.mapH = plot(axM, nan, nan, 'o', 'Color', K.cyan, 'MarkerFaceColor', K.cyan, 'MarkerSize', 5);
     plot(axM, [-180 180], [-180 180], ':', 'Color', K.dim);
     xlabel(axM, 'command (rpm)'); ylabel(axM, 'steady speed (rpm)');
-    legend(axY, [tr.yH tr.yS tr.yR tr.yRef tr.ref], {'rig', 'sim', 'replay', 'course model', 'setpoint'}, ...
+    legend(axY, [tr.yH tr.yS tr.yR tr.yRef tr.ref], {'rig', 'sim', 'replay', 'first-order theory', 'setpoint'}, ...
         'Location', 'northeast', 'TextColor', K.dim, 'Color', 'none', 'EdgeColor', 'none', ...
         'AutoUpdate', 'off', 'Orientation', 'horizontal');
     xlabel(axU, 't (s)');
@@ -292,9 +292,8 @@ function app = rhino_servo_lab()
         end
         ui.mb(k).BackgroundColor = K.cyan; ui.mb(k).FontColor = K.bg;
         ui.mission.Text = sprintf('%s · %s', upper(M.tag), upper(M.short));
-        if ~isempty(M.handout), ui.mission.Text = [ui.mission.Text '   (' M.handout ')']; end
         ui.brief.Text = M.brief;
-        presets = presetList(M);
+        presets = servolab.motor.presets(M);
         ui.preset.Items = {presets.label}; ui.preset.ItemsData = 1:numel(presets);
         ui.preset.Value = 1;
         layoutPlots();
@@ -302,58 +301,6 @@ function app = rhino_servo_lab()
         clearReplay();
         applyPreset();
         refreshRuns();
-    end
-
-    function L = presetList(M)
-        L = struct('label', {}, 'spec', {}, 'series', {});
-        for e = 1:numel(M.experiments)
-            j = find(strcmp({E.name}, M.experiments{e}), 1);
-            if isempty(j), continue; end
-            x = E(j); n = numel(x.runs);
-            for r = 1:n
-                s = x.runs(r);
-                L(end + 1) = struct('label', sprintf('%s%s', shortName(x.name), runTag(s, n, r)), ...
-                    'spec', specFrom(s, x), 'series', []); %#ok<AGROW>
-            end
-            if n > 1
-                L(end + 1) = struct('label', sprintf('▶▶ all %d runs: %s', n, shortName(x.name)), ...
-                    'spec', specFrom(x.runs(1), x), 'series', x); %#ok<AGROW>
-            end
-        end
-        if strcmp(M.kind, 'physics')                    % the bare motor, voltage-driven
-            L = struct('label', {'open loop: voltage step (speed and current)', 'speed PID', 'speed PI, load torque step at 1 s', ...
-                                  'speed PI, inertia x1.5', 'position PID', 'position PID, load torque step at 1.5 s'}, ...
-                'spec', {phys('speed', 'OL', 0, 0, 0, [0 0; 0.1 90], 1, 0, 1, 1), ...
-                         phys('speed', 'PID', 0.05, 1.0, 0.0002, [0 0; 0.1 100], 1.5, 0, 1, 1), ...
-                         phys('speed', 'PI', 0.05, 1.0, 0, [0 0; 0.1 100], 2, 1.0, 1, 1), ...
-                         phys('speed', 'PI', 0.05, 1.0, 0, [0 0; 0.1 100], 1.5, 0, 1, 1.5), ...
-                         phys('position', 'PID', 0.3, 0.5, 0.01, [0 0; 0.1 90], 2, 0, 1, 1), ...
-                         phys('position', 'PID', 0.3, 0.5, 0.01, [0 0; 0.1 90], 3, 1.0, 1.5, 1)}, ...
-                'series', {[], [], [], [], [], []});
-        end
-        if isempty(L)                                   % LAB
-            L = struct('label', {'speed PI, 60 rpm', 'speed P, Kp 0.5', 'speed open loop, 40 rpm', ...
-                                  'position P, 90 deg', 'position PI, 90 deg'}, ...
-                'spec', {lab('speed', 'PI', 0.3, 1.5, [0 60], 10), lab('speed', 'P', 0.5, 0, [0 60], 8), ...
-                         lab('speed', 'OL', 0, 0, [0 40], 8), lab('position', 'P', 0.3, 0, [0 90], 8), ...
-                         lab('position', 'PI', 0.3, 0.03, [0 90], 12)}, 'series', {[], [], [], [], []});
-        end
-    end
-
-    function s = specFrom(r, x)
-        s = struct('loop', r.loop, 'ctrl', r.ctrl, 'Kp', r.Kp, 'Ki', r.Ki, 'Kd', 0, 'profile', r.profile, ...
-            'Tend', r.duration, 'spdFb', r.spdFb, 'uMax', r.uMax, 'experiment', x.id, 'name', x.name, ...
-            'plant', 'rigId', 'dist', 0, 'tDist', 3, 'Jf', 1);
-    end
-    function s = lab(loop, ctrl, Kp, Ki, prof, T)
-        s = struct('loop', loop, 'ctrl', ctrl, 'Kp', Kp, 'Ki', Ki, 'Kd', 0, 'profile', prof, 'Tend', T, ...
-            'spdFb', 'drive', 'uMax', NaN, 'experiment', 'MOTOR-LAB', 'name', 'LAB', ...
-            'plant', 'rigId', 'dist', 0, 'tDist', 3, 'Jf', 1);
-    end
-    function s = phys(loop, ctrl, Kp, Ki, Kd, prof, T, dist, tDist, Jf)
-        s = struct('loop', loop, 'ctrl', ctrl, 'Kp', Kp, 'Ki', Ki, 'Kd', Kd, 'profile', prof, 'Tend', T, ...
-            'spdFb', 'encoder', 'uMax', NaN, 'experiment', 'MOTOR-SIM', 'name', 'armature model', ...
-            'plant', 'arm', 'dist', dist, 'tDist', tDist, 'Jf', Jf);
     end
 
     function setPresetByIndex(i), ui.preset.Value = i; applyPreset(); end
@@ -431,7 +378,7 @@ function app = rhino_servo_lab()
     function setField(name, v)
         h = ui.(name);
         if isa(h, 'matlab.ui.control.EditField'), h.Value = char(v); else, h.Value = v; end
-        paramChanged(true);
+        if strcmp(name, 'plant'), plantChanged(); else, paramChanged(true); end   % as the menu does
     end
 
     function paramChanged(now)
@@ -481,15 +428,12 @@ function app = rhino_servo_lab()
             say('Open loop is a speed experiment: choose P, I or PI for position.', 'warn'); return;
         end
         showPhysics(c.PD);
-        if strcmp(c.plantKey, 'rigId')
-            if c.dist ~= 0 || ui.Jf.Value ~= 1
-                say('The identified model has no load torque or inertia: choose a physics plant to see them.', 'warn');
-            end
-            S = servolab.motor.identifiedSim(model, c, profile, Tend);
-        else
-            S = fromPhysics(servolab.motor.simulate(c), c);
-            if S.diverged, say('The simulation diverged: the loop is unstable with these gains.', 'warn'); end
+        if strcmp(c.plantKey, 'rigId') && (c.dist ~= 0 || ui.Jf.Value ~= 1)
+            say('The identified model has no load torque or inertia: choose RIG · drive + motor physics to see them.', 'warn');
         end
+        c.profile = profile; c.Tend = Tend;
+        S = servolab.motor.simulatePlant(c, model);
+        if S.diverged, say('The simulation diverged: the loop is unstable with these gains.', 'warn'); end
         S.y = yOf(S); S.ang = S.thOut;
         Mref = [];
         if strcmp(c.plantKey, 'rigId') && strcmp(c.loop, 'speed') && any(strcmp(MIS(mis).kind, {'step', 'lab'}))
@@ -500,17 +444,6 @@ function app = rhino_servo_lab()
         drawSim();
         fillTable();
         if ~hw.on, poseAt('sim', Tend); end
-    end
-
-    function T = fromPhysics(Sp, c)
-        % servolab.motor.simulate output in the shape the app draws (as identifiedSim's)
-        k = min(numel(Sp.t), round(Sp.tk / c.dt) + 1);
-        T = struct('t', Sp.t, 'w', Sp.w_rpm, 'thOut', Sp.th_deg, 'i', Sp.i, 'tk', Sp.tk, 'r', Sp.r(k), ...
-            'meas', Sp.ym, 'u', Sp.uk, 'e', Sp.e, 'uFine', Sp.u, 'diverged', Sp.diverged, 'cfg', c);
-        n = find(isfinite(T.w), 1, 'last'); T.w(n + 1:end) = NaN;
-        % electrical power drawn: (back-EMF + R i) i, base side; battery current = power / supply voltage
-        P = c.P; wB = T.w * P.N * P.rpm; pe = max(0, (P.Ke * wB + P.R * T.i) .* T.i);
-        T.iBatt = mean(pe(isfinite(pe))) / P.V_supply;
     end
 
     function showPhysics(D)
@@ -556,8 +489,10 @@ function app = rhino_servo_lab()
                     mdl = 'servo_identified';
                     if ~isfile(fullfile(here, [mdl '.slx'])), build_motor_identified_simulink(here); end
                     w = motor_identified_simulink_params(model, c, profile, Tend);
-                otherwise
-                    say('The drive-physics plant exists in MATLAB only; Simulink models: identified rig and armature.', 'warn'); return;
+                case 'rigPhys'
+                    mdl = 'servo_drive_physics';
+                    if ~isfile(fullfile(here, [mdl '.slx'])), build_drive_physics_simulink(here); end
+                    w = drive_physics_simulink_params(c, profile, Tend);
             end
             load_system(fullfile(here, [mdl '.slx']));
             mw = get_param(mdl, 'ModelWorkspace');
@@ -875,7 +810,7 @@ function app = rhino_servo_lab()
         pr = getf(R.cfg, 'preset', '');
         tok = regexp(pr, '^(.*) \[run (\d+)/\d+\]$', 'tokens', 'once');
         if ~isempty(tok)
-            j = find(strcmp({E.name}, tok{1}), 1); k = str2double(tok{2});
+            j = find(strcmp({E.key}, servolab.motor.experimentKey(tok{1})), 1); k = str2double(tok{2});   % any name it ran under
             if ~isempty(j) && k <= numel(E(j).runs), p = E(j).runs(k).profile; return; end
         end
         T = R.T; ch = [1; find(abs(diff(T.setpoint)) > 1e-9) + 1];
@@ -1302,7 +1237,7 @@ function app = rhino_servo_lab()
         if ~isempty(added) && ~link.isOpen() && ~asking
             port = added{1}; asking = true;
             ui.port.Value = port;
-            uiconfirm(fig, sprintf(['Arduino found on %s.\n\nFlash the ENR312 motor firmware and connect, or ' ...
+            uiconfirm(fig, sprintf(['Arduino found on %s.\n\nFlash the motor firmware and connect, or ' ...
                 'connect to the firmware already on it?'], port), 'Board connected', ...
                 'Options', {'Flash + connect', 'Connect', 'Not now'}, 'DefaultOption', 2, 'CancelOption', 3, ...
                 'CloseFcn', @(~, e) onPlugAnswer(e.SelectedOption, port));
@@ -1446,24 +1381,6 @@ end
 
 function s = profileText(p)
     s = strjoin(arrayfun(@(k) sprintf('%g %g', p(k, 1), p(k, 2)), 1:size(p, 1), 'UniformOutput', false), '; ');
-end
-
-function s = shortName(n)
-    s = regexprep(n, '^Course ', '');
-    s = regexprep(s, '\s*\(.*\)$', '');
-    if numel(s) > 46, s = [s(1:44) '…']; end
-end
-
-function s = runTag(r, n, k)
-    g = '';
-    switch r.ctrl
-        case 'P',  g = sprintf('Kp %g', r.Kp);
-        case 'I',  g = sprintf('Ki %g', r.Ki);
-        case 'PI', g = sprintf('Kp %g Ki %g', r.Kp, r.Ki);
-    end
-    fb = ''; if strcmp(r.loop, 'speed') && strcmp(r.spdFb, 'encoder'), fb = ', encoder'; end
-    if n > 1, s = sprintf('  · run %d/%d%s%s', k, n, ternary(isempty(g), '', [': ' g]), fb);
-    else, s = sprintf('%s%s', ternary(isempty(g), '', ['  · ' g]), fb); end
 end
 
 function s = shortId(id)

@@ -8,7 +8,7 @@ function m = fitFOPDT(t, y, du, opts)
 %   t   time since the input step (s), column; y measured output; du input step size.
 %   Returns m.K (output per input unit), m.tau (s), m.theta (s), m.y0, m.yInf,
 %   m.rmse, m.fit (model on t), m.r2, and m.t63 (graphical 63 % time, for comparison
-%   with the hand method the course asks for).
+%   with the graphical tangent method).
 %
 %   Least squares by fminsearch from a graphical start (y0 = first sample, yInf = mean
 %   of the last 20 %, t63 = first crossing of 63 %). Base MATLAB only.

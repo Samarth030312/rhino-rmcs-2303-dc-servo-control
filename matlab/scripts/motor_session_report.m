@@ -1,9 +1,9 @@
 function N = motor_session_report(day, fromTime)
-%MOTOR_SESSION_REPORT  Report one rig session's course runs against the identified model.
+%MOTOR_SESSION_REPORT  Report one rig session's characterisation and design runs against the identified model.
 %
 %   N = motor_session_report('2026-10-23', '18:50')
 %
-%   Collects the hardware runs of the "Course S3-x" experiments recorded that day (from
+%   Collects the hardware runs of the characterisation and design experiments recorded that day (from
 %   fromTime on), keeps the latest complete run of each, simulates each one with its own
 %   settings on the identified rig model (servolab.motor.identifiedSim + rigModel, the
 %   same as the app), scores both with servolab.motor.stepMetrics, and writes
@@ -30,9 +30,9 @@ function N = motor_session_report(day, fromTime)
          'same settings, so each comparison is a prediction. Units: output-shaft rpm and degrees.'], height(I), fromTime);
     say('');
 
-    % ---------------------------------------------------------------- S3-3 static map
-    say('## S3-3 Static map: steady speed against command');
-    fw = latest('Course S3-3', 1); rv = latest('Course S3-3', 2);
+    % ---------------------------------------------------------------- static map
+    say('## Static map: steady speed against command');
+    fw = latest('static_map', 1); rv = latest('static_map', 2);
     f = fig(); ax = axes(f); hold(ax, 'on'); grid(ax, 'on');
     rows = {};
     for R = {fw, rv}
@@ -44,7 +44,7 @@ function N = motor_session_report(day, fromTime)
     end
     plot(ax, [-150 150], [-150 150], ':', 'Color', [0.5 0.5 0.5], 'DisplayName', 'speed = command');
     xlabel(ax, 'command (rpm)'); ylabel(ax, 'steady speed, encoder (rpm)'); legend(ax, 'Location', 'northwest');
-    title(ax, sprintf('S3-3 static map, rig %s', day)); save_(f, 'S3-3_static_map.png');
+    title(ax, sprintf('Static map, rig %s', day)); save_(f, 'static_map.png');
     if isfield(N, 'mapFwd')
         c = N.mapFwd.map.cmd; w = N.mapFwd.map.speed; j = find(c > 0, 1);
         say(['Commands 1 to 150 rpm held 3 s each, both directions, speed from encoder counts (0.115 rpm resolution; ' ...
@@ -56,20 +56,20 @@ function N = motor_session_report(day, fromTime)
         say(''); say('| command (rpm) | steady speed (rpm) |'); say('|---:|---:|');
         for k = 1:size(rows, 1), say('| %g | %.2f |', rows{k, 1}, rows{k, 2}); end
     end
-    say(''); say('![static map](S3-3_static_map.png)'); say('');
+    say(''); say('![static map](static_map.png)'); say('');
 
-    % ---------------------------------------------------------------- S3-2 / S3-4 open-loop step
-    say('## S3-2 / S3-4 Open-loop step 0 -> 60 rpm');
-    r1 = latest('Course S3-2/S3-4', 1); r2 = latestAny('Course S3-2/S3-4', 2);
+    % ---------------------------------------------------------------- open-loop step
+    say('## Open-loop step 0 -> 60 rpm');
+    r1 = latest('ol_step', 1); r2 = latestAny('ol_step', 2);
     if ~isempty(r1)
         T = load_(r1.id); [S, m, ms] = simRun(r1, T);
         N.ol = struct('rise', m.rise, 'ramp', m.ramp, 'gain', m.gain, 'simRise', ms.rise, 'rmse', rmse(S, T));
-        plotRun(T, S, sprintf('S3-2/S3-4 open loop 0 -> 60 rpm, drive speed register (%s)', shortId(r1.id)), 'S3-4_open_loop.png');
+        plotRun(T, S, sprintf('Open loop 0 -> 60 rpm, drive speed register (%s)', shortId(r1.id)), 'open_loop_step.png');
         say(['Drive-register feedback (run 1): rise 10-90 %% **%.2f s** (model %.2f s), mean slope %.1f rpm/s (model ramp 53.4), ' ...
              'gain %.3f, RMSE rig vs model %.2f rpm (the register moves in 4.6 rpm steps). The step response is the drive''s ' ...
              'acceleration ramp, not a first-order lag.'], m.rise, ms.rise, m.ramp, m.gain, N.ol.rmse);
     end
-    r2f = latest('Course S3-2/S3-4', 2);
+    r2f = latest('ol_step', 2);
     if ~isempty(r2f)
         T2 = load_(r2f.id); [~, m2, ms2] = simRun(r2f, T2);
         N.ol2 = struct('rise', m2.rise, 'ramp', m2.ramp, 'gain', m2.gain, 'simRise', ms2.rise);
@@ -78,31 +78,31 @@ function N = motor_session_report(day, fromTime)
              shortId(r2f.id), m2.rise, ms2.rise, m2.ramp, m2.gain);
     elseif ~isempty(r2)
         say(['\n**Encoder-feedback run (run 2): not obtained.** It was started %d time(s) in this session and each time the ' ...
-             'firmware cut motor power (see "Safety events").'], nnz(contains(I.name, 'Course S3-2/S3-4') & I.run == 2));
+             'firmware cut motor power (see "Safety events").'], nnz(strcmp(I.key, 'ol_step') & I.run == 2));
     end
-    say(''); say('![open loop](S3-4_open_loop.png)'); say('');
+    say(''); say('![open loop](open_loop_step.png)'); say('');
 
-    % ---------------------------------------------------------------- S3-5 position P
-    say('## S3-5 Position P: final error of 10 deg moves');
+    % ---------------------------------------------------------------- position P, small moves
+    say('## Position P: final error of 10 deg moves');
     say('| Kp | final error, rig (deg) | model (deg) | overshoot rig (%%) | settling rig (s) |'); say('|---:|---:|---:|---:|---:|');
     for k = 1:3
-        r = latest('Course S3-5', k); if isempty(r), continue; end
+        r = latest('position_p_small', k); if isempty(r), continue; end
         T = load_(r.id); [S, m, ms] = simRun(r, T);
         N.posP(k) = struct('Kp', r.Kp, 'ess', m.ess, 'simEss', ms.ess, 'over', m.overshoot); %#ok<AGROW>
         say('| %.1f | %.3f | %.3f | %.1f | %s |', r.Kp, m.ess, ms.ess, m.overshoot, num(m.settling));
-        if k == 2, plotRun(T, S, sprintf('S3-5 position P, Kp %.1f, 10 deg (%s)', r.Kp, shortId(r.id)), 'S3-5_position_P.png'); end
+        if k == 2, plotRun(T, S, sprintf('Position P, Kp %.1f, 10 deg (%s)', r.Kp, shortId(r.id)), 'position_p_small.png'); end
     end
     say(['\nOne encoder count is %.3f deg. P alone reaches a 10 deg target to within a few counts at every gain: the ' ...
-         'drive''s own loop removes the motor''s dead zone, so even a 0.1 rpm command turns the shaft (S3-11).'], P.deg_per_count);
-    say(''); say('![position P](S3-5_position_P.png)'); say('');
+         'drive''s own loop removes the motor''s dead zone, so even a 0.1 rpm command turns the shaft.'], P.deg_per_count);
+    say(''); say('![position P](position_p_small.png)'); say('');
 
-    % ---------------------------------------------------------------- S3-9 speed I only
-    say('## S3-9 Speed I only: damping against Ki');
+    % ---------------------------------------------------------------- speed I only
+    say('## Speed I only: damping against Ki');
     say('Theory (first-order plant K 1, tau 0.72 s): zeta = 1 / (2 sqrt(tau K Ki)), overshoot exp(-pi zeta / sqrt(1 - zeta^2)).');
     say(''); say('| Ki | zeta | overshoot theory (%%) | model (%%) | rig (%%) | rise rig (s) |'); say('|---:|---:|---:|---:|---:|---:|');
     f = fig(); ax = axes(f); hold(ax, 'on'); grid(ax, 'on'); cols = lines(4);
     for k = 1:4
-        r = latest('Course S3-9', k); if isempty(r), continue; end
+        r = latest('speed_i_sweep', k); if isempty(r), continue; end
         T = load_(r.id); [S, m, ms] = simRun(r, T);
         z = 1 / (2 * sqrt(0.72 * r.Ki)); ost = 100 * exp(-pi * z / sqrt(max(1e-9, 1 - z^2))) * (z < 1);
         N.spdI(k) = struct('Ki', r.Ki, 'zeta', z, 'overTheory', ost, 'overSim', ms.overshoot, 'overRig', m.overshoot); %#ok<AGROW>
@@ -111,19 +111,19 @@ function N = motor_session_report(day, fromTime)
         plot(ax, S.t, S.w, '-', 'Color', 0.45 * cols(k, :) + 0.55, 'LineWidth', 1, 'HandleVisibility', 'off');
     end
     yline(ax, 30, '--', 'HandleVisibility', 'off'); xlabel(ax, 't (s)'); ylabel(ax, 'speed (rpm)'); legend(ax, 'Location', 'southeast');
-    title(ax, 'S3-9 speed I only, 0 -> 30 rpm (pale: model)'); save_(f, 'S3-9_I_sweep.png');
+    title(ax, 'Speed I only, 0 -> 30 rpm (pale: model)'); save_(f, 'speed_i_sweep.png');
     say('\nMore Ki, less damping, as the theory says; the identified model (with the 70 ms latency and the drive ramp) tracks the rig more closely than the delay-free formula.');
-    say(''); say('![I sweep](S3-9_I_sweep.png)'); say('');
+    say(''); say('![I sweep](speed_i_sweep.png)'); say('');
 
-    % ---------------------------------------------------------------- S3-10 PI design
-    say('## S3-10 Speed PI designed for zeta 0.7 (Kp 1.0, Ki 2.9)');
-    r = latest('Course S3-10', 1);
+    % ---------------------------------------------------------------- PI design
+    say('## Speed PI designed for zeta 0.7 (Kp 1.0, Ki 2.9)');
+    r = latest('speed_pi_design', 1);
     if ~isempty(r)
         T = load_(r.id); [S, m, ms] = simRun(r, T);
         k30 = T.t_s >= 4 & T.t_s < 8; k40 = T.t_s >= 12 & T.t_s < 16;
         N.pi = struct('overRig', m.overshoot, 'overSim', ms.overshoot, 'ripple30', (max(T.meas(k30)) - min(T.meas(k30))) / 2, ...
             'ripple40', (max(T.meas(k40)) - min(T.meas(k40))) / 2, 'rmse', rmse(S, T));
-        plotRun(T, S, sprintf('S3-10 speed PI Kp 1.0 Ki 2.9, encoder feedback (%s)', shortId(r.id)), 'S3-10_PI.png');
+        plotRun(T, S, sprintf('Speed PI Kp 1.0 Ki 2.9, encoder feedback (%s)', shortId(r.id)), 'speed_pi_design.png');
         say(['First step 0 -> 30 rpm: overshoot **%.1f %%** on the rig, %.1f %% in the model; the textbook design predicted 4.6 %%. ' ...
              'After it the loop does not settle: it holds a **limit cycle of +/- %.1f rpm at 30 rpm and +/- %.1f rpm at 40 rpm** ' ...
              '(model RMSE %.2f rpm, the model shows the same cycle). The design ignored the 70 ms Modbus latency and the ' ...
@@ -131,11 +131,11 @@ function N = motor_session_report(day, fromTime)
              'include the delay (or use a lower Kp: the hand-tuned Kp 0.3, Ki 1.5 settles).'], ...
              m.overshoot, ms.overshoot, N.pi.ripple30, N.pi.ripple40, N.pi.rmse);
     end
-    say(''); say('![PI design](S3-10_PI.png)'); say('');
+    say(''); say('![PI design](speed_pi_design.png)'); say('');
 
-    % ---------------------------------------------------------------- S3-12 windup
-    say('## S3-12 Saturation and windup (command limited to 50 rpm, 80 asked, then 30)');
-    r = latest('Course S3-12', 1);
+    % ---------------------------------------------------------------- windup
+    say('## Saturation and windup (command limited to 50 rpm, 80 asked, then 30)');
+    r = latest('windup', 1);
     if ~isempty(r)
         T = load_(r.id); [S, m, ms] = simRun(r, T);
         c0 = R2cfg(r); c0.antiWindup = false;
@@ -148,14 +148,14 @@ function N = motor_session_report(day, fromTime)
         plot(ax, T.t_s, T.meas, '-', 'Color', [0 0.45 0.74], 'LineWidth', 1.6, 'DisplayName', 'rig (firmware clamps)');
         stairs(ax, T.t_s, T.setpoint, 'k--', 'DisplayName', 'setpoint');
         xlabel(ax, 't (s)'); ylabel(ax, 'speed (rpm)'); legend(ax, 'Location', 'northeast');
-        title(ax, sprintf('S3-12 windup (%s)', shortId(r.id))); save_(f, 'S3-12_windup.png');
+        title(ax, sprintf('Windup (%s)', shortId(r.id))); save_(f, 'windup.png');
         say(['The output sits at the 50 rpm limit for %.1f s while 80 is asked. When the setpoint drops to 30 rpm, the rig ' ...
              'is back within 5 %% in **%.1f s** (model with clamping %.1f s). The same model with a plain integrator %s: ' ...
              'that difference is the windup the firmware''s clamping prevents.'], m.satTime, m.recovery, ms.recovery, ...
              ternary(isnan(m0.recovery), sprintf('**does not get back within the remaining %.0f s**', T.t_s(end) - 6), ...
                      sprintf('needs **%.1f s**', m0.recovery)));
     end
-    say(''); say('![windup](S3-12_windup.png)'); say('');
+    say(''); say('![windup](windup.png)'); say('');
 
     % ---------------------------------------------------------------- safety events
     say('## Safety events');
@@ -186,12 +186,12 @@ function N = motor_session_report(day, fromTime)
         s = sprintf(fmt, varargin{:});
         L = [L, strsplit(s, newline)];
     end
-    function r = latest(prefix, k)
-        j = find(startsWith(I.name, prefix) & I.run == k & strcmp(I.result, 'FINISHED'), 1);
+    function r = latest(key, k)
+        j = find(strcmp(I.key, key) & I.run == k & strcmp(I.result, 'FINISHED'), 1);
         if isempty(j), r = []; else, r = table2struct(I(j, :)); end
     end
-    function r = latestAny(prefix, k)
-        j = find(startsWith(I.name, prefix) & I.run == k, 1);
+    function r = latestAny(key, k)
+        j = find(strcmp(I.key, key) & I.run == k, 1);
         if isempty(j), r = []; else, r = table2struct(I(j, :)); end
     end
     function T = load_(id), R = servolab.motor.loadHardwareRun(id); T = R.T; end
@@ -201,7 +201,7 @@ function N = motor_session_report(day, fromTime)
         if ~isfield(c, 'spdFb'), c.spdFb = 'drive'; end
     end
     function p = profileOf(r)
-        E = servolab.motor.hwExperiments(); j = find(strcmp({E.name}, r.name), 1);
+        E = servolab.motor.hwExperiments(); j = find(strcmp({E.key}, r.key), 1);
         p = E(j).runs(r.run).profile;
     end
     function [S, m, ms] = simRun(r, T)
@@ -248,4 +248,9 @@ function s = ternary(c, a, b), if c, s = a; else, s = b; end, end
 function s = num(v), if isnan(v), s = 'not settled'; else, s = sprintf('%.2f', v); end, end
 function v = getf(N, f, k), if isfield(N, f), v = N.(f).(k); else, v = NaN; end, end
 function s = shortId(id), s = regexprep(id, '^MOTOR-\d+-HW-', ''); end
-function s = shortName(n), s = regexprep(regexprep(n, '^Course ', ''), ':.*$', ''); end
+function s = shortName(n)
+    % the experiment's current name (runs keep the name they ran under), up to its first colon
+    E = servolab.motor.hwExperiments(); j = find(strcmp({E.key}, servolab.motor.experimentKey(n)), 1);
+    if ~isempty(j), n = E(j).name; end
+    s = regexprep(n, ':.*$', '');
+end

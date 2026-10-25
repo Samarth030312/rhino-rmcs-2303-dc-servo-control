@@ -1,12 +1,12 @@
 function mdl = build_dc_motor_simulink(outDir)
-%BUILD_DC_MOTOR_SIMULINK  Generate servo_armature.slx (course week-4 model).
+%BUILD_DC_MOTOR_SIMULINK  Generate servo_armature.slx: the bare motor driven by armature voltage.
 %
 %   mdl = build_dc_motor_simulink()            % writes matlab/models/dc_motor/
 %   mdl = build_dc_motor_simulink(outDir)
 %
 %   The model is the BARE motor driven by armature voltage (ED-M1 option C):
 %
-%     setpoint -> (+)-> Discrete PID (Ts, clamped, limited) -+-> [Switch] -> V
+%     setpoint -> (+)-> Arduino PID (Ts, clamped, limited) -+-> [Switch] -> V
 %                  ^-                                          |   open loop: r / Kss
 %                  |                                           |
 %     measured <- [select speed | position] <- quantise <- DC motor <- load step
@@ -35,11 +35,7 @@ function mdl = build_dc_motor_simulink(outDir)
     B = @(lib, name, pos, varargin) add_block(lib, [mdl '/' name], 'Position', pos, varargin{:});
     B('simulink/Sources/Step', 'Setpoint', [30 95 60 125], 'Time', 'tStep', 'Before', '0', 'After', 'setpoint', 'SampleTime', '0');
     B('simulink/Math Operations/Sum', 'Error', [110 100 130 120], 'Inputs', '|+-', 'IconShape', 'round');
-    B('simulink/Discrete/Discrete PID Controller', 'Controller', [170 90 250 130], ...
-      'Controller', 'PID', 'Form', 'Parallel', 'P', 'Kp', 'I', 'Ki', 'D', 'Kd', 'N', '1/Tf', ...
-      'UseFilter', 'on', 'SampleTime', 'Ts', 'IntegratorMethod', 'Backward Euler', 'FilterMethod', 'Backward Euler', ...
-      'LimitOutput', 'on', 'UpperSaturationLimit', 'uMax', 'LowerSaturationLimit', '-uMax', ...
-      'AntiWindupMode', 'clamping');
+    simulink_arduino_pid([mdl '/Controller']);           % the same PID law as the firmware and pidStep
     B('simulink/Math Operations/Gain', 'Open-loop calibration', [170 160 250 190], 'Gain', 'ffGain');
     B('simulink/Discrete/Zero-Order Hold', 'OL sample', [270 160 300 190], 'SampleTime', 'Ts');
     B('simulink/Discontinuities/Saturation', 'OL limit', [320 160 350 190], 'UpperLimit', 'uMax', 'LowerLimit', '-uMax');
@@ -105,11 +101,13 @@ function mdl = build_dc_motor_simulink(outDir)
     T('loopSel/1', 'Measured/1'); T('to rpm/1', 'Measured/2'); T('Sample/1', 'Measured/3');
     T('Measured/1', 'Error/2'); T('Measured/1', 'measured/1');
 
+    simulink_tidy(mdl);
+
     note = Simulink.Annotation([mdl '/note']);
-    note.Text = ['Rhino DC servo - bare motor, voltage drive (course week 4). ' ...
-        'Parameters are ESTIMATED from the RMCS-5032 datasheet (docs/knowledge-base/HARDWARE_REFERENCE.md 1.5). ' ...
+    note.Text = ['Rhino DC servo - bare motor, voltage drive (no RMCS-2303). ' ...
+        'Parameters are ESTIMATED from the RMCS-5032 datasheet (docs/hardware/HARDWARE_REFERENCE.md). ' ...
         'Set them with run_dc_motor_simulink(cfg); do not edit numbers by hand.'];
-    note.Position = [30 390 700 420];
+    note.Position = simulink_note_position(mdl, 700);
 
     if ~exist(outDir, 'dir'), mkdir(outDir); end
     save_system(mdl, fullfile(outDir, [mdl '.slx']));

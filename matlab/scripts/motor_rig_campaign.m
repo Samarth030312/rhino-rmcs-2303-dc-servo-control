@@ -1,12 +1,12 @@
 function R = motor_rig_campaign(port, missions)
-%MOTOR_RIG_CAMPAIGN  Every course experiment of the DC-motor missions on the rig, in the app.
+%MOTOR_RIG_CAMPAIGN  Every hardware experiment of the DC-motor missions on the rig, in the app.
 %
 %   R = motor_rig_campaign('/dev/ttyUSB0')            % M1-M9, all their experiments
 %   R = motor_rig_campaign('COM5', {'M1', 'M5'})
-%   R = motor_rig_campaign(port, {'M1', 'all 2 runs: S3-2'; 'M6', 'S3-12'})   % N x 2: mission, preset text
+%   R = motor_rig_campaign(port, {'M1', 'all 2 runs: Open-loop step'; 'M6', 'Saturation'})   % N x 2: mission, preset text
 %
 %   Opens rhino_servo_lab, connects, runs DRIVE CHECK, then for each mission plays each of
-%   its course experiments (the "all runs" preset when an experiment has several runs)
+%   its hardware experiments (the "all runs" preset when an experiment has several runs)
 %   exactly as RUN ON RIG does. Every run is saved and registered by the app. A firmware
 %   fault is logged, cleared, and the campaign goes on with the next experiment.
 %   Progress: results/evidence/logs/campaign_<time>.log. R: one row per experiment.

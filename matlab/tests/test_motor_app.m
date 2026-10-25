@@ -31,20 +31,28 @@ function testEveryMissionSimulatesAndFillsItsTable(tc)
     end
 end
 
-function testEveryPresetOfEveryMissionRuns(tc)
-    app = tc.TestData.app; M = servolab.motor.missions();
+function testEveryPresetOfEveryMissionRunsWithoutAWarning(tc)
+    % what a user sees: every preset simulates and the message line shows no warning; a rig
+    % preset also on the drive-physics plant
+    app = tc.TestData.app; M = servolab.motor.missions(); K = servolab.ui.palette();
     for k = 1:numel(M)
         app.selectMission(k);
         for p = 1:numel(app.ui.preset.Items)
-            app.setPreset(p);
+            app.setPreset(p); what = sprintf('%s: %s', M(k).tag, app.ui.preset.Items{p});
             S = app.sim();
-            tc.verifyTrue(all(isfinite(S.meas)), sprintf('%s preset %d', M(k).tag, p));
+            tc.verifyTrue(all(isfinite(S.meas)), what);
+            tc.verifyNotEqual(app.ui.say.FontColor, K.amber, [what ' -> ' app.ui.say.Text]);
+            if strcmp(app.ui.plant.Value, 'rigId')
+                app.set('plant', 'rigPhys'); S = app.sim();
+                tc.verifyTrue(all(isfinite(S.meas)), [what ' (drive physics)']);
+                tc.verifyNotEqual(app.ui.say.FontColor, K.amber, [what ' (drive physics) -> ' app.ui.say.Text]);
+            end
         end
     end
 end
 
-function testSpeedPIMatchesTheCourseNumbers(tc)
-    % M5, S3-10 design (Kp 1.0, Ki 2.9): the course first-order model (REF) gives ~10 %
+function testSpeedPIDesignAgainstTheory(tc)
+    % M5, PI designed for zeta 0.7 (Kp 1.0, Ki 2.9): first-order theory (REF) gives ~10 %
     % overshoot on the first step; the identified rig model (SIM) much more (latency, ramp).
     app = tc.TestData.app; app.selectMission(5); app.setPreset(1);
     D = app.metricsTable();
@@ -98,4 +106,18 @@ function testNoRigMeansRunIsRefusedPolitely(tc)
     app.runRig();
     tc.verifyFalse(app.state().on);
     tc.verifyTrue(contains(app.ui.say.Text, 'Not connected'));
+end
+
+function testOpenInSimulinkForEveryPlant(tc)
+    tc.assumeTrue(~isempty(ver('simulink')) && license('test', 'Simulink'), 'Simulink not installed');
+    app = tc.TestData.app; K = servolab.ui.palette(); M = servolab.motor.missions();
+    plans = {'M5', 'rigId', 'servo_identified'; 'M5', 'rigPhys', 'servo_drive_physics'; 'M10', 'arm', 'servo_armature'};
+    for k = 1:size(plans, 1)
+        app.selectMission(find(strcmp({M.tag}, plans{k, 1}))); app.setPreset(1);
+        if ~strcmp(app.ui.plant.Value, plans{k, 2}), app.set('plant', plans{k, 2}); end
+        app.simulink();
+        tc.verifyTrue(bdIsLoaded(plans{k, 3}), plans{k, 3});
+        tc.verifyNotEqual(app.ui.say.FontColor, K.amber, [plans{k, 3} ': ' app.ui.say.Text]);
+        if bdIsLoaded(plans{k, 3}), close_system(plans{k, 3}, 0); end
+    end
 end

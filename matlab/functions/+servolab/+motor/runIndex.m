@@ -4,7 +4,7 @@ function I = runIndex()
 %   I = servolab.motor.runIndex()       % table
 %
 %   Columns: id, runNo, created (datetime), mission (M1..), rig, experiment, name (the hardware experiment,
-%   without the "[run k/n]" suffix), run (k), loop, fb ('drive' | 'encoder' | ''), ctrl,
+%   without the "[run k/n]" suffix, as named when it ran), key (servolab.motor.experimentKey of name), run (k), loop, fb ('drive' | 'encoder' | ''), ctrl,
 %   Kp, Ki, uMax, rows, result ('FINISHED' or the firmware's first error), port.
 %   Only metadata is read (fast); the raw CSV is loaded on demand with loadHardwareRun.
     root = servolab.data.root();
@@ -39,7 +39,8 @@ function I = runIndex()
             keep(k) = false;                                  % unreadable metadata: not listed
         end
     end
-    I = table(id, runNo, created, mission, rig, experiment, name, run, loop, fb, ctrl, Kp, Ki, uMax, rows, result, port);
+    key = servolab.motor.experimentKey(name);
+    I = table(id, runNo, created, mission, rig, experiment, name, key, run, loop, fb, ctrl, Kp, Ki, uMax, rows, result, port);
     I = I(keep, :);
     I = sortrows(I, 'created', 'descend');
 end

@@ -30,7 +30,7 @@
 //      resolution 60 / (5200 * Ts) output rpm (0.115 rpm at Ts = 0.1 s), delay ~Ts/2
 //   P  position, output-shaft degrees from encoder counts (5200 per output rev)
 //
-// Loop timing (course MOTOR S3-6): every sample measures, with micros(), the control-law time
+// Loop timing: every sample measures, with micros(), the control-law time
 // and the whole sample (Modbus read + control + Modbus write + telemetry). $DIAG prints the
 // statistics of the last run.
 //

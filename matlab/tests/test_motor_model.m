@@ -124,12 +124,17 @@ function testLatencyMustNotExceedTs(tc)
     tc.verifyError(@() servolab.motor.simulate(c), 'servolab:motor:latency');
 end
 
-function testEveryPresetRuns(tc)
-    p = servolab.motor.presets();
-    for k = 1:numel(p)
-        S = servolab.motor.simulate(servolab.motor.presetConfig(p(k).name));
-        tc.verifyFalse(S.diverged, p(k).name);
-        tc.verifyTrue(all(isfinite(S.y)), p(k).name);
+function testEveryPresetRunsOnItsPlantAndOnTheDrivePhysics(tc)
+    % every experiment the app offers, on its own plant; a rig experiment also on the physics plant
+    L = servolab.motor.presets(); L = L(arrayfun(@(x) isempty(x.series), L));
+    for k = 1:numel(L)
+        c = servolab.motor.specConfig(L(k).spec); what = [L(k).mission ' ' L(k).label];
+        S = servolab.motor.simulatePlant(c);
+        tc.verifyFalse(S.diverged, what); tc.verifyTrue(all(isfinite(S.meas)), what);
+        if strcmp(c.plantKey, 'rigId')
+            c.plantKey = 'rigPhys'; S = servolab.motor.simulatePlant(c);
+            tc.verifyFalse(S.diverged, [what ' (drive physics)']); tc.verifyTrue(all(isfinite(S.meas)), [what ' (drive physics)']);
+        end
     end
 end
 

@@ -7,7 +7,7 @@ function c = defaultConfig(plant, loop)
 %   plant 'rig'   RMCS-2303 in digital speed mode (Mode 1) + RMCS-5032, with the
 %                 Arduino closing an outer loop over Modbus (ED-M1 option B).
 %                 Controller output u = speed command, OUTPUT-shaft rpm.
-%   plant 'bare'  The same motor driven by armature voltage (course week-4 / CTMS
+%   plant 'bare'  The same motor driven by armature voltage (the textbook / CTMS
 %                 model; ED-M1 option C). Not the lab hardware. u = volts.
 %
 %   Setpoint units: output rpm (speed) or output degrees (position).

@@ -22,7 +22,7 @@ function testLibraryIsSafeAndComplete(tc)
     for e = E
         for r = e.runs
             if strcmp(r.loop, 'speed')
-                lim = 120; if startsWith(e.name, 'Course S3-3'), lim = 150; end
+                lim = 120; if strcmp(e.key, 'static_map'), lim = 150; end
                 tc.verifyLessThanOrEqual(max(abs(r.profile(:, 2))), lim, e.name);   % 11.2 V battery
                 tc.verifyLessThan(lim, servolab.motor.params().w_free_out_rpm, e.name);
             else
@@ -37,7 +37,7 @@ end
 function testPlaysProfileAndSweep(tc)
     ft = tc.TestData.ft; link = tc.TestData.link;
     E = servolab.motor.hwExperiments();
-    e = E(strcmp({E.name}, 'Speed P gain sweep (Kp 0.2 / 0.5 / 0.8)'));
+    e = E(strcmp({E.key}, 'speed_p_sweep'));
     done = [];
     runner = servolab.motor.ExperimentRunner(link, e, @(c, k) [], @(s, T, k) noteDone(k), @() clk(tc));
     runner.start();
@@ -58,7 +58,7 @@ end
 function testEncoderFeedbackAndLimitReachFirmware(tc)
     ft = tc.TestData.ft; link = tc.TestData.link;
     E = servolab.motor.hwExperiments();
-    e = E(startsWith({E.name}, 'Course S3-12'));
+    e = E(strcmp({E.key}, 'windup'));
     runner = servolab.motor.ExperimentRunner(link, e, @(c, k) [], @(s, T, k) [], @() clk(tc));
     runner.start();
     tc.verifyTrue(any(startsWith(ft.sent, "$CFG,1,E,PI,0.3,1.5,0,10,100,50*")), strjoin(ft.sent, ' | '));
@@ -67,7 +67,7 @@ end
 function testSetpointProfileTiming(tc)
     ft = tc.TestData.ft; link = tc.TestData.link;
     E = servolab.motor.hwExperiments();
-    e = E(strcmp({E.name}, 'Direction and reversal, open loop'));
+    e = E(strcmp({E.key}, 'ol_reversal'));
     runner = servolab.motor.ExperimentRunner(link, e, @(c, k) [], @(s, T, k) [], @() clk(tc));
     runner.start();
     tc.TestData.t = 4.9; runner.tick();

@@ -2,7 +2,7 @@ function w = dc_motor_simulink_params(c)
 %DC_MOTOR_SIMULINK_PARAMS  Model-workspace variables for servo_armature.slx
 %   from an servolab.motor config (plant must be 'bare').
     assert(strcmp(c.plant, 'bare'), 'servolab:simulink:plant', ...
-        'the Simulink model is the bare motor; the rig is simulated in MATLAB only');
+        'servo_armature is the bare motor; the rig models are servo_identified and servo_drive_physics');
     assert(~(strcmp(c.ctrl, 'OL') && strcmp(c.loop, 'position')), 'servolab:simulink:olpos', ...
         'timed open-loop position is not modelled in Simulink');
     P = c.P;
@@ -16,6 +16,7 @@ function w = dc_motor_simulink_params(c)
     end
     w.Kp = g.Kp; w.Ki = g.Ki; w.Kd = g.Kd; w.Tf = c.Tf;
     w.Ts = c.Ts; w.uMax = c.uMax;
+    w.KiOn = double(w.Ki ~= 0); w.aw = 1;
     w.setpoint = c.setpoint; w.tStep = c.tStep; w.dist = c.dist; w.tDist = c.tDist; w.Tend = c.Tend;
     w.loopSel = 1 + strcmp(c.loop, 'position');
     w.closedLoop = double(~strcmp(c.ctrl, 'OL'));
