@@ -1,0 +1,22 @@
+12:38:25  campaign on /dev/ttyUSB0, 9 step(s)
+12:38:43  connected: fw a04ae3c · drive id 7
+12:38:48  drive check: Drive check done (register dump and loop time in the dialog and the session log).
+12:38:51  M1  RUN  ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm
+12:39:23  M1  DONE ▶▶ all 2 runs: S3-2/S3-4: open-loop step 0 -> 60 rpm  32 s  runs: MOTOR-R0149_20261025-123902_M1 [FINISHED], MOTOR-R0150_20261025-123917_M1 [FINISHED]  
+12:39:28  M2  RUN  ▶▶ all 2 runs: S3-3: static map, speed vs command
+12:41:01  M2  DONE ▶▶ all 2 runs: S3-3: static map, speed vs command  93 s  runs: MOTOR-R0151_20261025-124010_M2 [FINISHED], MOTOR-R0152_20261025-124056_M2 [FINISHED]  
+12:41:06  M3  RUN  ▶▶ all 3 runs: Speed P gain sweep
+12:41:45  M3  DONE ▶▶ all 3 runs: Speed P gain sweep  39 s  runs: MOTOR-R0153_20261025-124114_M3 [FINISHED], MOTOR-R0154_20261025-124127_M3 [FINISHED], MOTOR-R0155_20261025-124141_M3 [FINISHED]  
+12:41:48  M4  RUN  ▶▶ all 4 runs: S3-9: speed I only, Ki sweep 0.5 / 1 / 2 / 4
+12:42:50  M4  DONE ▶▶ all 4 runs: S3-9: speed I only, Ki sweep 0.5 / 1 / 2 / 4  61 s  runs: MOTOR-R0156_20261025-124159_M4 [FINISHED], MOTOR-R0157_20261025-124214_M4 [FINISHED], MOTOR-R0158_20261025-124230_M4 [FINISHED], MOTOR-R0159_20261025-124245_M4 [FINISHED]  
+12:42:53  M5  RUN  S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder
+12:43:22  M5  DONE S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder  29 s  runs: MOTOR-R0160_20261025-124316_M5 [FINISHED]  
+12:43:26  M6  RUN  S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder
+12:43:44  M6  DONE S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder  18 s  runs: MOTOR-R0161_20261025-124339_M6 [FINISHED]  
+12:43:48  M7  RUN  ▶▶ all 3 runs: S3-5: position P final error, 10 deg moves
+12:44:23  M7  DONE ▶▶ all 3 runs: S3-5: position P final error, 10 deg moves  35 s  runs: MOTOR-R0162_20261025-124356_M7 [FINISHED], MOTOR-R0163_20261025-124407_M7 [FINISHED], MOTOR-R0164_20261025-124419_M7 [FINISHED]  
+12:44:26  M8  RUN  Position I only (Ki 0.1): expect oscillation  · Ki 0.1
+12:44:44  M8  DONE Position I only (Ki 0.1): expect oscillation  · Ki 0.1  18 s  runs: MOTOR-R0165_20261025-124439_M8 [FINISHED]  
+12:44:48  M9  RUN  Position PI  · Kp 0.3 Ki 0.03
+12:45:05  M9  DONE Position PI  · Kp 0.3 Ki 0.03  17 s  runs: MOTOR-R0166_20261025-124500_M9 [FINISHED]  
+12:45:07  campaign finished
