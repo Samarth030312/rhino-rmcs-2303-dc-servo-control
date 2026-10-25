@@ -1,0 +1,22 @@
+12:08:42  campaign on /dev/ttyUSB0, 9 step(s)
+12:08:59  connected: fw 348dc56 · drive id 7
+12:09:04  drive check: Drive check done (register dump and loop time in the dialog and the session log).
+12:09:07  M1  RUN  S3-2/S3-4: open-loop step 0 -> 60 rpm  · run 1/2
+12:09:22  M1  DONE S3-2/S3-4: open-loop step 0 -> 60 rpm  · run 1/2  15 s  runs: MOTOR-R0113_20261025-120917_M1 [FINISHED]  
+12:09:25  M2  RUN  S3-3: static map, speed vs command  · run 1/2, encoder
+12:10:11  M2  DONE S3-3: static map, speed vs command  · run 1/2, encoder  45 s  runs: MOTOR-R0114_20261025-121006_M2 [FINISHED]  
+12:10:15  M3  RUN  Speed P gain sweep  · run 1/3: Kp 0.2
+12:10:26  M3  DONE Speed P gain sweep  · run 1/3: Kp 0.2  11 s  runs: MOTOR-R0115_20261025-121023_M3 [FINISHED]  
+12:10:29  M4  RUN  Speed I only  · Ki 1
+12:10:50  M4  DONE Speed I only  · Ki 1  20 s  runs: MOTOR-R0116_20261025-121045_M4 [FINISHED]  
+12:10:53  M5  RUN  S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder
+12:11:20  M5  DONE S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder  27 s  runs: MOTOR-R0117_20261025-121115_M5 [FINISHED]  
+12:11:23  M6  RUN  S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder
+12:11:39  M6  DONE S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder  15 s  runs: MOTOR-R0118_20261025-121136_M6 [FINISHED]  
+12:11:42  M7  RUN  S3-5: position P final error, 10 deg moves  · run 1/3: Kp 0.1
+12:11:54  M7  DONE S3-5: position P final error, 10 deg moves  · run 1/3: Kp 0.1  12 s  runs: MOTOR-R0119_20261025-121150_M7 [FINISHED]  
+12:11:58  M8  RUN  Position I only (Ki 0.1): expect oscillation  · Ki 0.1
+12:12:13  M8  DONE Position I only (Ki 0.1): expect oscillation  · Ki 0.1  15 s  runs: MOTOR-R0120_20261025-121210_M8 [FINISHED]  
+12:12:16  M9  RUN  Position PI  · Kp 0.3 Ki 0.03
+12:12:33  M9  DONE Position PI  · Kp 0.3 Ki 0.03  17 s  runs: MOTOR-R0121_20261025-121229_M9 [FINISHED]  
+12:12:35  campaign finished

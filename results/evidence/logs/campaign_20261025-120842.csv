@@ -1,0 +1,10 @@
+mission,preset,run_ids,results,fault,seconds
+M1,"S3-2/S3-4: open-loop step 0 -> 60 rpm  · run 1/2",MOTOR-R0113_20261025-120917_M1,FINISHED,,14.568819
+M2,"S3-3: static map, speed vs command  · run 1/2, encoder",MOTOR-R0114_20261025-121006_M2,FINISHED,,45.351804
+M3,"Speed P gain sweep  · run 1/3: Kp 0.2",MOTOR-R0115_20261025-121023_M3,FINISHED,,11.287003
+M4,"Speed I only  · Ki 1",MOTOR-R0116_20261025-121045_M4,FINISHED,,20.405039
+M5,"S3-10: speed PI designed for zeta 0.7  · Kp 1 Ki 2.9, encoder",MOTOR-R0117_20261025-121115_M5,FINISHED,,26.739856
+M6,"S3-12: PI with the command limited to 50 rpm  · Kp 0.3 Ki 1.5, encoder",MOTOR-R0118_20261025-121136_M6,FINISHED,,15.22587
+M7,"S3-5: position P final error, 10 deg moves  · run 1/3: Kp 0.1",MOTOR-R0119_20261025-121150_M7,FINISHED,,12.46415
+M8,"Position I only (Ki 0.1): expect oscillation  · Ki 0.1",MOTOR-R0120_20261025-121210_M8,FINISHED,,15.219197
+M9,"Position PI  · Kp 0.3 Ki 0.03",MOTOR-R0121_20261025-121229_M9,FINISHED,,17.043828
