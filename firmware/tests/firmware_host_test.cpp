@@ -326,8 +326,13 @@ int main(int argc, char **argv) {
     for (char c : std::string(":0703000A0001EB\r\n")) Serial.in.push_back(c);   // read LPR (register 10)
     runFor(200, false);
     CHECK(Serial.out.substr(mark).find(":070302000DE7") != std::string::npos, "BRIDGE: a Modbus frame from the PC reaches the drive and its reply comes back (LPR 13)");
+    emu.reg[2] = 0x0101;                                                      // the software had started the motor
     mark = Serial.out.size(); setup();                                       // the port opens: the Uno resets
-    CHECK(Serial.baud == 9600 && Serial.out.find("$HELLO", mark) == std::string::npos, "BRIDGE survives a reset (EEPROM)");
+    CHECK(Serial.baud == 9600 && Serial.out.size() == mark, "BRIDGE survives a reset (EEPROM), silent and at 9600 at once");
+    CHECK(emu.reg[2] == 0x0700, "BRIDGE after a reset: motor power off, slave id from EEPROM");
+    for (char c : std::string(":0703000A0001EB\r\n")) Serial.in.push_back(c);   // the software's first frame
+    runFor(200, false);
+    CHECK(Serial.out.substr(mark).find(":070302000DE7") != std::string::npos, "BRIDGE after a reset: the first frame is answered");
     for (char c : std::string("$ENDBRIDGE\n")) Serial.in.push_back(c);
     mark = Serial.out.size(); runFor(2000, false);
     CHECK(Serial.baud == 115200 && Serial.out.find("$HELLO,1,rhino_servo_lab,", mark) != std::string::npos && EEPROM.read(0) == 0,

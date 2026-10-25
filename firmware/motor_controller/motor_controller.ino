@@ -97,9 +97,11 @@ float stopLastAbs = 0;
 // BRIDGE: the Uno becomes a transparent USB <-> drive link at the drive's 9600 baud, so the
 // manufacturer's configuration software (Windows) reaches the drive without rewiring. Opening
 // a port resets a CH340 Uno, so the mode is kept in EEPROM and survives resets until
-// $ENDBRIDGE (sent at 9600) or the STOP button ends it. Motor power is switched off first; in
-// BRIDGE the manufacturer's software is in charge and this firmware's guards are not active.
-const int EE_BRIDGE = 0;
+// $ENDBRIDGE (sent at 9600) or the STOP button ends it. After such a reset the Uno comes back
+// silent and at 9600 at once (no banner at 115200, no 1.5 s wait), so the software's first frames
+// are not lost in noise. Motor power is switched off first; in BRIDGE the manufacturer's software
+// is in charge and this firmware's guards are not active.
+const int EE_BRIDGE = 0, EE_BRIDGE_ID = 1;
 const uint8_t BRIDGE_MAGIC = 0xB7;
 bool bridging = false;
 uint8_t bridgeMatch = 0;
@@ -343,7 +345,7 @@ static void handleLine(char *line) {
   }
   if (!strcmp(t, "BRIDGE")) {
     if (running || stopping) { err(t, 3, "stop first"); return; }
-    EEPROM.update(EE_BRIDGE, BRIDGE_MAGIC);
+    EEPROM.update(EE_BRIDGE, BRIDGE_MAGIC); EEPROM.update(EE_BRIDGE_ID, slaveId);
     ack(t); startBridge(); return;
   }
   if (!strcmp(t, "DIAG")) {
@@ -553,6 +555,15 @@ static void startBridge() {
   bridging = true; bridgeMatch = 0;
 }
 
+// a reset while bridging (the software opened the port): straight back, silent, at 9600
+static void resumeBridge() {
+  Serial.begin(DRIVE_BAUD);
+  drive.begin(DRIVE_BAUD);
+  slaveId = EEPROM.read(EE_BRIDGE_ID);
+  if (slaveId) mbWrite(REG_MODE, MODE_SAFE_STOP);   // motor power off, as at every start
+  bridging = true; bridgeMatch = 0;
+}
+
 static void endBridge() {
   EEPROM.update(EE_BRIDGE, 0);
   Serial.flush(); Serial.end();
@@ -575,11 +586,11 @@ static void bridgeStep() {
 void setup() {
   pinMode(PIN_LED, OUTPUT);
   pinMode(PIN_STOP_BTN, INPUT_PULLUP);
+  if (EEPROM.read(EE_BRIDGE) == BRIDGE_MAGIC) { resumeBridge(); return; }
   Serial.begin(HOST_BAUD);
   drive.begin(DRIVE_BAUD);
   delay(1500);                                     // drive boot (it may have been powered with the Uno)
   findDrive();
-  if (EEPROM.read(EE_BRIDGE) == BRIDGE_MAGIC) { startBridge(); return; }
   char b[48]; snprintf(b, sizeof(b), "HELLO,1,%s,%s,%u", FW_NAME, FW_REV, slaveId); sendFrame(b);
 }
 
