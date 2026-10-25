@@ -281,7 +281,8 @@ function app = rhino_servo_lab()
         'runRig', @onRunRig, 'stop', @onStop, 'abort', @doAbort, 'clearFault', @onClearFault, ...
         'diag', @onDiag, 'liveSet', @liveTo, 'state', @getHw, 'link', @getLink, ...
         'mission', @getMission, 'model', @getModel, 'record', @recordVideo, 'simulink', @onSimulink, ...
-        'bridge', @() onBridge(false), 'endBridge', @onEndBridge);
+        'bridge', @() onBridge(false), 'endBridge', @onEndBridge, ...
+        'liveTrace', @() [get(tr.yH, 'XData')', get(tr.yH, 'YData')']);
 
     % =================================================================== missions, presets
     function selectMission(k)
@@ -1045,7 +1046,7 @@ function app = rhino_servo_lab()
 
     function onRunStart(c, k)
         % called just before RUN is sent: everything slow happens here, then one full render
-        hw.cfg = c; hw.runStart = link.n; hw.runK = k;
+        hw.cfg = c; hw.runK = k;                       % the link starts a fresh table at every RUN
         clearLive();
         if strcmp(hw.kind, 'series')
             hw.cfg.antiWindup = true;
@@ -1125,10 +1126,7 @@ function app = rhino_servo_lab()
     function T = hwTable()
         T = table();
         if link.n == 0, return; end
-        T = link.table();
-        if isfield(hw, 'runStart') && hw.runStart > 0 && height(T) > hw.runStart
-            T = T(hw.runStart + 1:end, :);
-        end
+        T = link.table();                              % this run's frames only (SerialLink.run resets it)
     end
     function t = hwT()
         T = hwTable(); t = 0; if ~isempty(T) && height(T) > 0, t = T.t_s(end); end

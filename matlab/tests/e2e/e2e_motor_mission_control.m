@@ -80,6 +80,15 @@ function ok = e2e_motor_mission_control(simBinary)
     I = app.runs();
     ok = check(height(I) >= 1 && any(strcmp(I.key, 'ol_reversal')), 'RUNS lists the new run') & ok;
 
+    % ---- a run longer than the one before it is drawn from its first frame (the live plot once
+    % hid as many frames as the previous run had: 2026-10-25, R0197)
+    k = find(contains(items, 'Open-loop speed steps'), 1); app.setPreset(k);
+    app.runRig(); t1 = tic; pause(1); while app.state().on && toc(t1) < 30, pause(0.2); end
+    L = app.liveTrace(); T = app.link().table();
+    ok = check(size(L, 1) == height(T) && abs(L(1, 1) - T.t_s(1)) < 1e-9, ...
+        sprintf('a longer run after a shorter one is drawn whole: %d of %d points, from t = %.2f s', ...
+        size(L, 1), height(T), L(1, 1))) & ok;
+
     % ---- ABORT during a run
     app.runRig(); pause(1.5);
     nStop = numel(strfind(fileread(log), '> $STOP,1'));
